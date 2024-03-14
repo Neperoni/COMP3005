@@ -1,6 +1,0 @@
-2024-03-13 15:34:24.114 EDT [9272] LOG:  starting PostgreSQL 16.2, compiled by Visual C++ build 1937, 64-bit
-2024-03-13 15:34:24.117 EDT [9272] LOG:  could not bind IPv4 address "127.0.0.1": Permission denied
-2024-03-13 15:34:24.117 EDT [9272] LOG:  could not bind IPv6 address "::1": Permission denied
-2024-03-13 15:34:24.118 EDT [9272] WARNING:  could not create listen socket for "localhost"
-2024-03-13 15:34:24.118 EDT [9272] FATAL:  could not create any TCP/IP sockets
-2024-03-13 15:34:24.119 EDT [9272] LOG:  database system is shut down
