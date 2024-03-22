@@ -1,4 +1,4 @@
-create table Member
+create table Members
 	(userID		serial,
 	 firstName		varchar(15),
      lastName       varChar(15),
@@ -10,7 +10,7 @@ create table Member
 	 primary key (userID)
 	);
 
-create table Trainer
+create table Trainers
 	(trainerID		serial,
 	 phone		    varchar(15),
      email          varchar(30),
@@ -19,7 +19,7 @@ create table Trainer
 	);
 
 --room and time are on schedule
-create table Event
+create table Events
 	(
     eventID		serial, 
     trainerID		integer,
@@ -29,7 +29,7 @@ create table Event
     foreign key (trainerID) references Trainer
 	);
 
-create table Participant
+create table Participants
 (
     eventID integer,
     userID integer,
@@ -38,7 +38,7 @@ create table Participant
     foreign key (userID) references Member(userID)
 );
 
-create table Equipment
+create table Equipments
 (
     equipmentID serial,
     equipName varchar(30) unique,
@@ -52,7 +52,7 @@ create table Equipment
     primary key (equipmentID)
 );
 
-create table TrainerAvailability
+create table TrainerAvailabilitys
 (
     trainerID integer,
     day varchar(1),
@@ -81,3 +81,27 @@ create table Schedule
         and s.eventID <> Schedule.eventID
     ))
 );
+
+-- Create basic roles
+CREATE ROLE member;
+CREATE ROLE trainer;
+CREATE ROLE admin;
+
+ALTER TABLE Member ENABLE ROW LEVEL SECURITY;
+ALTER TABLE Trainer ENABLE ROW LEVEL SECURITY;
+
+CREATE POLICY member_policy
+ON Member
+FOR SELECT
+USING (userID = current_setting('app.user_id')::integer);
+
+CREATE POLICY trainer_policy
+ON Trainer
+FOR SELECT
+USING (trainerID = current_setting('app.trainer_id')::integer);
+
+GRANT SELECT, INSERT, UPDATE, DELETE ON Equipment, Schedule TO admin;
+
+-- Grant necessary permissions to each role
+--GRANT member TO user1;
+--GRANT trainer TO user2;
