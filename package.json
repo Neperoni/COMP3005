@@ -1,0 +1,25 @@
+{
+  "name": "comp3005",
+  "version": "1.0.0",
+  "description": "",
+  "main": "server.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "node server.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Neperoni/COMP3005GroupProject.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/Neperoni/COMP3005GroupProject/issues"
+  },
+  "homepage": "https://github.com/Neperoni/COMP3005GroupProject#readme",
+  "dependencies": {
+    "express": "^4.19.1",
+    "express-session": "^1.18.0",
+    "pg": "^8.11.3"
+  }
+}

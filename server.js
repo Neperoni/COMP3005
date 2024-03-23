@@ -1,4 +1,8 @@
 const express = require('express');
+const session = require('express-session');
+const crypto = require('crypto');
+const path = require('path');
+
 const bodyParser = require('body-parser');
 const { Pool } = require('pg');
 const { access } = require('fs');
@@ -7,13 +11,19 @@ const app = express();
 
 const secretKey = crypto.randomBytes(32).toString('hex');
 
+const AccountTypes = {
+  MEMBER: 0,
+  TRAINER: 1,
+  ADMIN: 2
+};
+
 app.use(session({
   secret: secretKey,
   resave: false,
   saveUninitialized: false
 }));
 
-const port = 3000;
+const port = 3003;
 
 const pool = new Pool({
   user: 'app',
@@ -24,55 +34,63 @@ const pool = new Pool({
 });
 
 
+// Serve static files from the "Public" directory
+app.use(express.static('Public'));
+
+app.use('/Privileged/member', requireLogin(AccountTypes.MEMBER), express.static(path.join(__dirname, 'privileged/member')));
+
+app.use('/Privileged/trainer', requireLogin(AccountTypes.TRAINER), express.static(path.join(__dirname, 'privileged/trainer')));
+
+app.use('/Privileged/admin', requireLogin(AccountTypes.ADMIN), express.static(path.join(__dirname, 'privileged/admin')));
+
 app.use(bodyParser.json());
 
-// Serve static files from the "Public" directory
-app.use(express.static(path.join(__dirname, 'Public')));
-
 app.post('/login', async (req, res) => {
-  const {email, password, loginType} = req.body;
+  const { email, password } = req.body;
+  console.log(`login request: ${email} ${password}`);
 
-  //data validation
-  if(!(email && password)){
-    return res.status(400).json({ error: 'At least one value invalid' });
+  if (!(email && password)) {
+    return res.status(400).json({ error: 'Email and password are required' });
   }
 
-  const result = await pool.query('SELECT 1 FROM Users WHERE email = $1, password = %2', [email, password]);
+  try {
+    // Execute SQL query to check email and password
+    const result = await pool.query('SELECT accountType FROM Users WHERE email = $1 AND password = $2', [email, password]);
 
-  if(result.length==0){
-    return res.status(400).json({ error: 'Incorrect email or password' });
-  }
+    // Check if the user exists
+    if (result.rows.length === 0) {
+      console.log("Login rejected")
+      return res.status(400).json({ error: 'Incorrect email or password' });
+    }
 
-  const accountType = result.rows[0].accountType;
+    // Extract accountType from the result
+    const accountType = Number(result.rows[0].accounttype);
 
-  if(accountType<0 || accountType>2){
-    res.status(500).json({ error: 'Internal Server Error, unknown account type' });
-  }
-
-  //user is logged in
-  //remember their connection, store their user id
+    // Set user session data
     req.session.user = {
       email: email,
       accountType: accountType
-  };
+    };
 
-  //when they make other requests, remember their connection, get the user id,
-    //handled by express-session middleware
+    console.log("redirect to profile")
 
-  //and restrict the info they can request
-  //only members are in members table, only trainers in trainer table, admins dont have user data they just have elevated permissions
-  //redirect to profile
-  res.redirect('/profile');
+    res.status(200).json({ accountType: accountType, message: 'Login successful. Redirecting to profile page.' });
+    
+  } catch (error) {
+    console.error('Error logging in:', error);
+    res.status(500).json({ error: 'Internal Server Error' });
+  }
+});
 
-})
 
 // Route to add a new user
 app.post('/register', async (req, res) => {
-  const {email, password, card} = req.body;
+  const { email, password, card } = req.body;
   try {
-
+    
+    console.log(`register request: ${email} ${password} ${card}`);
     //data validation
-    if(!(email && password && card)){
+    if (!(email && password && card)) {
       return res.status(400).json({ error: 'At least one value invalid' });
     }
     if (isNaN(Number(card)) || card.length !== 16) {
@@ -84,47 +102,64 @@ app.post('/register', async (req, res) => {
     if (result.rows.length > 0) {
       return res.status(400).json({ error: 'Email already exists' });
     }
-    
 
     //card is valid, password non empty, email unique
 
     //register user
 
-    //transcation to add member and user info to tables
-    const registerResult = await pool.query('SELECT RegisterMember($1, $2, $3) AS registration_status', [email, password, card]);
-    // Extract registration status from the result
-    const registrationStatus = registerResult.rows[0].registration_status;
 
-    if (registrationStatus) {
-      return res.status(201).json({ message: 'User added successfully' });
-    } else {
-      return res.status(500).json({ error: 'Failed to register user' });
+    const emailArray = Array.from(email); // Convert string to array of characters
+    const passwordArray = Array.from(password); // Convert string to array of characters
+    const cardArray = Array.from(card); // Convert string to array of characters
+
+    //apparently its better to handle transactions at the app level instead of in sQL
+
+    try {
+      // Start a transaction
+      await pool.query('BEGIN');
+
+      await pool.query('INSERT INTO Users (email, password, accountType) VALUES ($1, $2, $3)', [email, password, AccountTypes.MEMBER]);
+      await pool.query('INSERT INTO Members (email, card) VALUES ($1, $2)', [email, card]);
+
+      // Commit the transaction if both insertions succeed
+      await pool.query('COMMIT');
+
+      console.log('User registered successfully');
+    } catch (error) {
+      // If an error occurs during either insertion, rollback the transaction
+      await pool.query('ROLLBACK');
+      console.error('Error registering user:', error);
     }
+
   } catch (err) {
     console.error('Error executing query', err);
     res.status(500).json({ error: 'Internal Server Error' });
   }
 
-  //redirect to login
-  res.redirect('/login');
 });
 
-function requireLogin(req, res, next) {
-  if (req.session && req.session.user) {
-      // User is logged in, proceed to the next middleware
-      next();
-  } else {
-      // User is not logged in, redirect to login page or send an error response
-      res.status(401).send('Unauthorized');
-  }
+function requireLogin(accountType) {
+  return function(req, res, next) {
+    if (req.session && req.session.user) {
+      // User is logged in
+      
+      const { accountType: userAccountType } = req.session.user;
+      
+      if (userAccountType === accountType) {
+        // User account type matches the required account type, proceed
+        next();
+      } else {
+        // User account type does not match the required account type, send unauthorized response
+        res.status(401).send('Unauthorized');
+      }
+    } else {
+      // User is not logged in, redirect to login page
+      res.redirect('/login');
+    }
+  };
 }
 
-// Usage: Apply this middleware to routes that require authentication
-app.get('/profile', requireLogin, (req, res) => {
-  // Access user data from session
-  const user = req.session.user;
-  res.send(`Welcome ${user.username}`);
-});
+
 
 app.listen(port, () => {
   console.log(`Server is running on http://localhost:${port}`);

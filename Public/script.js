@@ -1,3 +1,12 @@
+
+
+const AccountTypes = {
+  MEMBER: 0,
+  TRAINER: 1,
+  ADMIN: 2
+};
+
+
 document.addEventListener('DOMContentLoaded', function () {
     const registrationForm = document.getElementById('registrationForm');
     const loginForm = document.getElementById('loginForm');
@@ -23,7 +32,7 @@ document.addEventListener('DOMContentLoaded', function () {
         });
   
         const responseData = await response.json();
-        alert(responseData.message); // Display registration status
+        alert(responseData.error); // Display registration status
         registrationForm.reset(); // Reset the form after successful registration
       } catch (error) {
         console.error('Error registering user:', error);
@@ -49,9 +58,24 @@ document.addEventListener('DOMContentLoaded', function () {
           },
           body: JSON.stringify(requestData)
         });
-  
         const responseData = await response.json();
-        alert(responseData.message); // Display login status
+        if (response.ok) {
+          switch (responseData.accountType) {
+            case AccountTypes.MEMBER:
+              window.location.href = '/Privileged/Member/member.html';
+              break;
+            case AccountTypes.TRAINER:
+              window.location.href = '/Privileged/Trainer/trainer.html';
+              break;
+            case AccountTypes.ADMIN:
+              window.location.href = '/Privileged/Admin/admin.html';
+              break;
+            default:
+              console.error("Unknown account type: " + responseData.accountType);
+              break;
+          }
+        }
+        
         loginForm.reset(); // Reset the form after successful login
       } catch (error) {
         console.error('Error logging in:', error);

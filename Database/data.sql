@@ -1,33 +1,34 @@
---users login with this data
 
---then we need to find out what they actually are
---member, trainer, admin
---i have to direct them to a table, as i cant store members and trainers in the same table
---and i cant just direct them to table
---unless i use email as a primary key
-CREATE TABLE Users(
-    email VARCHAR(30) NOT NULL UNIQUE,
-    password NOT NULL,
-    accountType BIT(2) NOT NULL
-)
 
-CREATE TABLE Members (
-    email VARCHAR(30) NOT NULL UNIQUE,
-    creditCard numeric(16,0) NOT NULL,
-    fitnessGoals TEXT,
-    restingbpm REAL,
-    bloodpressure REAL,
-    PRIMARY KEY (userID)
+--user login table
+--we then find out what kind of account they have
+--and direct it to the table and use email as the primary key
+
+DROP TABLE IF EXISTS Users;
+CREATE TABLE IF NOT EXISTS Users (
+    email VARCHAR(30) PRIMARY KEY NOT NULL,
+    password VARCHAR(255) NOT NULL,
+    accountType NUMERIC(1,0) NOT NULL
 );
 
+DROP TABLE IF EXISTS Members;
+CREATE TABLE IF NOT EXISTS Members (
+    email VARCHAR(30) PRIMARY KEY NOT NULL,
+    card NUMERIC(16,0) NOT NULL,
+    fitnessGoals TEXT,
+    restingbpm REAL,
+    bloodpressure REAL
+);
 
-create table Trainers
-	(email VARCHAR(30) NOT NULL UNIQUE,
-    trainerID		serial,
-	 phone		    varchar(15),
-     availability   text, 
-	 primary key (trainerID)
-	);
+DROP TABLE IF EXISTS Trainers;
+CREATE TABLE IF NOT EXISTS Trainers (
+    email VARCHAR(30) PRIMARY KEY NOT NULL,
+	name VARCHAR(15) NOT NULL,
+    phone VARCHAR(15)
+);
+
+/*
+
 
 --room and time are on schedule
 create table Events
