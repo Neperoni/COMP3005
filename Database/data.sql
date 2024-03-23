@@ -1,19 +1,30 @@
-create table Members
-	(userID		serial,
-	 firstName		varchar(15),
-     lastName       varChar(15),
-     email          varChar(30),
-     creditCard     varChar(16),
-     fitnessGoals   text,
-     restingbpm     real,
-     bloodpressure  real,
-	 primary key (userID)
-	);
+--users login with this data
+
+--then we need to find out what they actually are
+--member, trainer, admin
+--i have to direct them to a table, as i cant store members and trainers in the same table
+--and i cant just direct them to table
+--unless i use email as a primary key
+CREATE TABLE Users(
+    email VARCHAR(30) NOT NULL UNIQUE,
+    password NOT NULL,
+    accountType BIT(2) NOT NULL
+)
+
+CREATE TABLE Members (
+    email VARCHAR(30) NOT NULL UNIQUE,
+    creditCard numeric(16,0) NOT NULL,
+    fitnessGoals TEXT,
+    restingbpm REAL,
+    bloodpressure REAL,
+    PRIMARY KEY (userID)
+);
+
 
 create table Trainers
-	(trainerID		serial,
+	(email VARCHAR(30) NOT NULL UNIQUE,
+    trainerID		serial,
 	 phone		    varchar(15),
-     email          varchar(30),
      availability   text, 
 	 primary key (trainerID)
 	);
@@ -81,27 +92,3 @@ create table Schedule
         and s.eventID <> Schedule.eventID
     ))
 );
-
--- Create basic roles
-CREATE ROLE member;
-CREATE ROLE trainer;
-CREATE ROLE admin;
-
-ALTER TABLE Member ENABLE ROW LEVEL SECURITY;
-ALTER TABLE Trainer ENABLE ROW LEVEL SECURITY;
-
-CREATE POLICY member_policy
-ON Member
-FOR SELECT
-USING (userID = current_setting('app.user_id')::integer);
-
-CREATE POLICY trainer_policy
-ON Trainer
-FOR SELECT
-USING (trainerID = current_setting('app.trainer_id')::integer);
-
-GRANT SELECT, INSERT, UPDATE, DELETE ON Equipment, Schedule TO admin;
-
--- Grant necessary permissions to each role
---GRANT member TO user1;
---GRANT trainer TO user2;
