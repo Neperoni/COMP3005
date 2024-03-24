@@ -3,15 +3,33 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>User Profile</title>
-  <link rel="stylesheet" href="styles.css"> <!-- Include your stylesheet -->
+  <title>Trainer Dashboard</title>
+  <link rel="stylesheet" href="styles.css"><!-- public styles-->
 </head>
 <body>
-  <h1>Trainer Profile</h1>
-  <div id="profileInfo">
-    <!-- Profile information will be displayed here -->
+  <div class="container">
+    <div class="dashboard-box"> <!-- Wrap the Trainer Dashboard in a box -->
+      <h1>Trainer Dashboard</h1>
+
+      <!-- Search for members -->
+      <h2>Search for Members</h2>
+      <input type="text" id="firstInput" placeholder="Enter first name">
+      <input type="text" id="lastInput" placeholder="Enter last name">
+      <button onclick="searchMembers()">Search</button>
+      <table id="membersTable">
+        <!-- Table rows will be dynamically filled by JavaScript -->
+      </table>
+
+      <!-- Manage schedule -->
+      <h2>Manage Schedule</h2>
+      <p>Set your available time slots:</p>
+      <!-- Input fields to set time slots -->
+      <!-- Example: -->
+      <input type="text" id="timeSlotInput" placeholder="Enter available time slot">
+      <button onclick="addTimeSlot()">Add</button>
+    </div>
   </div>
 
-  <script src="script.js"></script> <!-- Include your JavaScript file -->
+  <script src="trainerScript.js"></script>
 </body>
 </html>

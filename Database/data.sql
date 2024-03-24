@@ -14,6 +14,8 @@ CREATE TABLE IF NOT EXISTS Users (
 DROP TABLE IF EXISTS Members;
 CREATE TABLE IF NOT EXISTS Members (
     email VARCHAR(30) PRIMARY KEY NOT NULL,
+    firstName VARCHAR(15) NOT NULL,
+    lastName VARCHAR(15) NOT NULL,
     card NUMERIC(16,0) NOT NULL,
     fitnessGoals TEXT,
     restingbpm REAL,

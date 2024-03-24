@@ -8,15 +8,21 @@
 </head>
 <body>
   <h1>User Registration</h1>
-  <form id="registrationForm">
-    <label for="email">Email:</label><br>
-    <input type="email" id="email" name="email" required value="default@example.com"><br>
-    <label for="password">Password:</label><br>
-    <input type="password" id="password" name="password" required value="defaultpassword"><br>
-    <label for="card">Card Number:</label><br>
-    <input type="text" id="card" name="card" pattern="[0-9]{16}" required value="1234567890123456"><br>
-    <button type="submit">Register</button>
-  </form>
+    <form id="registrationForm">
+        <label for="firstName">First Name:</label><br>
+        <input type="text" id="firstName" name="firstName" value="John" required><br>
+        <label for="lastName">Last Name:</label><br>
+        <input type="text" id="lastName" name="lastName" value="Doe" required><br>
+        <label for="email">Email:</label><br>
+        <input type="email" id="email" name="email" required><br>
+        <label for="password">Password:</label><br>
+        <input type="password" id="password" name="password" required><br>
+        <label for="card">Card Number:</label><br>
+        <input type="text" id="card" name="card" pattern="[0-9]{16}" required><br>
+        <button type="submit">Register</button>
+    </form>
+  
+  
 
   <hr>
 

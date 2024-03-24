@@ -85,12 +85,12 @@ app.post('/login', async (req, res) => {
 
 // Route to add a new user
 app.post('/register', async (req, res) => {
-  const { email, password, card } = req.body;
+  const { email, password, card , firstName, lastName} = req.body;
   try {
     
     console.log(`register request: ${email} ${password} ${card}`);
     //data validation
-    if (!(email && password && card)) {
+    if (!(email && password && card && firstName && lastName)) {
       return res.status(400).json({ error: 'At least one value invalid' });
     }
     if (isNaN(Number(card)) || card.length !== 16) {
@@ -119,7 +119,7 @@ app.post('/register', async (req, res) => {
       await pool.query('BEGIN');
 
       await pool.query('INSERT INTO Users (email, password, accountType) VALUES ($1, $2, $3)', [email, password, AccountTypes.MEMBER]);
-      await pool.query('INSERT INTO Members (email, card) VALUES ($1, $2)', [email, card]);
+      await pool.query('INSERT INTO Members (email, card, firstName, lastName) VALUES ($1, $2, $3, $4)', [email, card, firstName, lastName]);
 
       // Commit the transaction if both insertions succeed
       await pool.query('COMMIT');
@@ -154,10 +154,29 @@ function requireLogin(accountType) {
       }
     } else {
       // User is not logged in, redirect to login page
-      res.redirect('/login');
+      res.status(401).send('Unauthorized');
     }
   };
 }
+
+
+
+//trainer functions
+app.post('/searchMembers', requireLogin(AccountTypes.TRAINER), async (req, res) => {
+  const { firstName, lastName } = req.body;
+
+  try {
+    //console.log(`search request: ${firstName} ${lastName}`);
+    // Query the database
+    const searchResults = await pool.query('SELECT firstName, lastName, email, restingbpm FROM Members WHERE firstName = $1 AND lastName = $2', [firstName, lastName])
+
+    // Send formatted search results to the client
+    res.json(searchResults.rows);
+  } catch (error) {
+    console.error('Error searching for members:', error);
+    res.status(500).json({ error: 'Internal Server Error' });
+  }
+});
 
 
 

@@ -1,0 +1,70 @@
+/* styles.css */
+/* Apply styles to the container */
+.container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    background-color: #aed7ff; /* Brighter blue background */
+  }
+  
+  .dashboard-box {
+    padding: 20px;
+    border: 2px solid #0b629c; /* Darker blue border */
+    border-radius: 10px;
+    background-color: #e3f0fd; /* Lighter blue background */
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); /* Add shadow for depth */
+  }
+  
+  /* Additional styles for elements inside the dashboard-box can be added here */
+  
+  /* Additional styles for other dashboard elements */
+  
+body {
+    font-family: Arial, sans-serif;
+    background-color: #f0f0f0;
+    color: #333;
+    margin: 0;
+    padding: 0;
+  }
+  
+  h1, h2 {
+    color: #085280; /* Nice shade of blue */
+  }
+  
+  input[type="text"], button {
+    padding: 8px;
+    font-size: 16px;
+    border: none;
+    border-radius: 4px;
+  }
+  
+  button {
+    background-color: #085280; /* Nice shade of blue */
+    color: white;
+    cursor: pointer;
+  }
+  
+  button:hover {
+    background-color: #0a6da3; /* Darker shade of blue on hover */
+  }
+  
+  table {
+    border-collapse: collapse;
+    width: 100%;
+  }
+  
+  table, th, td {
+    border: 1px solid #ddd;
+    padding: 8px;
+  }
+  
+  th {
+    background-color: #085280; /* Nice shade of blue */
+    color: white;
+  }
+  
+  tr:nth-child(even) {
+    background-color: #f2f2f2;
+  }
+  
