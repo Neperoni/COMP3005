@@ -31,25 +31,27 @@ CREATE TABLE IF NOT EXISTS Trainers (
 
 /*
 
-
 --room and time are on schedule
+--accessed by event id
 create table Events
 	(
-    eventID		serial, 
-    trainerID		integer,
+    eventID		serial PRIMARY KEY, 
+    trainerEmail		VARCHAR(30) NOT NULL,
     is_public         boolean,
     description    text,
     primary key (eventID),
-    foreign key (trainerID) references Trainer
+    foreign key (trainerEmail) references Trainer
 	);
 
+
+--map many to many members to events
 create table Participants
 (
     eventID integer,
-    userID integer,
-    primary key (eventID, userID),
+    memberEmail VARCHAR(30) NOT NULL,
+    primary key (eventID, memberEmail),
     foreign key (eventID) references Event(eventID),
-    foreign key (userID) references Member(userID)
+    foreign key (memberEmail) references Member(memberEmail)
 );
 
 create table Equipments
@@ -66,6 +68,11 @@ create table Equipments
     primary key (equipmentID)
 );
 
+--trainers have several availability windows
+--so we need a one to many relationship
+--if there are two windows on the same day then trainerID and day is not unique enough
+--so also needs start time
+--convenient for displaying by soonness
 create table TrainerAvailabilitys
 (
     trainerID integer,
