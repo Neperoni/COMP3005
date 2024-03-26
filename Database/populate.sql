@@ -2,7 +2,7 @@ INSERT INTO Users (email, password, accountType) VALUES ('user1@example.com', 'p
 INSERT INTO Users (email, password, accountType) VALUES ('member1@example.com', 'securepass', 0);
 INSERT INTO Users (email, password, accountType) VALUES ('member2@example.com', 'safepass', 0);
 INSERT INTO Users (email, password, accountType) VALUES ('trainer1@example.com', 'workout123', 1);
-INSERT INTO Users (email, password, accountType) VALUES ('trainer1@example.com', 'workout123', 2);
+INSERT INTO Users (email, password, accountType) VALUES ('admin@example.com', 'admin456', 2);
 
 INSERT INTO Members (email, firstName, lastName, card, fitnessGoals, restingbpm, bloodpressure) VALUES
 ('member1@example.com', 'John', 'Doe', 1234567890123456, 'Lose weight, Gain muscle', 60, 120);
