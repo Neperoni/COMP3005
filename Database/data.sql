@@ -29,20 +29,11 @@ CREATE TABLE IF NOT EXISTS Trainers (
     phone VARCHAR(15)
 );
 
+--admins dont have user data except for login credentials
+--which is handled by Users
+
+
 /*
-
---room and time are on schedule
---accessed by event id
-create table Events
-	(
-    eventID		serial PRIMARY KEY, 
-    trainerEmail		VARCHAR(30) NOT NULL,
-    is_public         boolean,
-    description    text,
-    primary key (eventID),
-    foreign key (trainerEmail) references Trainer
-	);
-
 
 --map many to many members to events
 create table Participants
@@ -86,13 +77,15 @@ create table TrainerAvailabilitys
 
 create table Schedule
 (
-    eventID serial,
-    day varchar(1),
-    start_time time,
-    end_time time,
-    room integer,
-    primary key (start_time, end_time, room)
-    foreign key (room) references Event
+    eventID     serial,
+    day         varchar(1),
+    start_time  time,
+    end_time    time,
+    description text,
+    is_public   boolean,
+    room        integer,
+    primary key (eventID),
+    
     check (not exists (
         select 1
         from Schedule s
