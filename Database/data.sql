@@ -64,6 +64,7 @@ create table Equipments
 --if there are two windows on the same day then trainerID and day is not unique enough
 --so also needs start time
 --convenient for displaying by soonness
+
 create table TrainerAvailabilitys
 (
     trainerID integer,
