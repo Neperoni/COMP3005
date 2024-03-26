@@ -4,7 +4,7 @@ const crypto = require('crypto');
 const path = require('path');
 
 const bodyParser = require('body-parser');
-const { Pool } = require('pg');
+const { Client, Pool } = require('pg');
 const { access } = require('fs');
 
 const app = express();
@@ -25,13 +25,20 @@ app.use(session({
 
 const port = 3003;
 
-const pool = new Pool({
-  user: 'app',
+const client = new Client({
+  user: 'postgres',
   host: 'localhost',
   database: '3005Final',
-  password: 'app',
+  password: 'alex3689',
   port: 5432,
 });
+
+client.connect().then(() => {
+      console.log('Connected to PostgreSQL database');
+    })
+    .catch((err) => {
+      console.error('Error connecting to PostgreSQL database', err);
+    });
 
 
 // Serve static files from the "Public" directory
@@ -55,7 +62,7 @@ app.post('/login', async (req, res) => {
 
   try {
     // Execute SQL query to check email and password
-    const result = await pool.query('SELECT accountType FROM Users WHERE email = $1 AND password = $2', [email, password]);
+    const result = await client.query('SELECT accountType FROM Users WHERE email = $1 AND password = $2', [email, password]);
 
     // Check if the user exists
     if (result.rows.length === 0) {
@@ -97,7 +104,7 @@ app.post('/register', async (req, res) => {
       return res.status(400).json({ error: 'Card number must be a 16 digit numeric string' });
     }
 
-    const result = await pool.query('SELECT 1 FROM Members WHERE email = $1', [email]);
+    const result = await client.query('SELECT 1 FROM Members WHERE email = $1', [email]);
     // If the email already exists in the database, return an error
     if (result.rows.length > 0) {
       return res.status(400).json({ error: 'Email already exists' });
@@ -116,18 +123,18 @@ app.post('/register', async (req, res) => {
 
     try {
       // Start a transaction
-      await pool.query('BEGIN');
+      await client.query('BEGIN');
 
-      await pool.query('INSERT INTO Users (email, password, accountType) VALUES ($1, $2, $3)', [email, password, AccountTypes.MEMBER]);
-      await pool.query('INSERT INTO Members (email, card, firstName, lastName) VALUES ($1, $2, $3, $4)', [email, card, firstName, lastName]);
+      await client.query('INSERT INTO Users (email, password, accountType) VALUES ($1, $2, $3)', [email, password, AccountTypes.MEMBER]);
+      await client.query('INSERT INTO Members (email, card, firstName, lastName) VALUES ($1, $2, $3, $4)', [email, card, firstName, lastName]);
 
       // Commit the transaction if both insertions succeed
-      await pool.query('COMMIT');
+      await client.query('COMMIT');
 
       console.log('User registered successfully');
     } catch (error) {
       // If an error occurs during either insertion, rollback the transaction
-      await pool.query('ROLLBACK');
+      await client.query('ROLLBACK');
       console.error('Error registering user:', error);
     }
 
@@ -168,7 +175,7 @@ app.post('/searchMembers', requireLogin(AccountTypes.TRAINER), async (req, res) 
   try {
     //console.log(`search request: ${firstName} ${lastName}`);
     // Query the database
-    const searchResults = await pool.query('SELECT firstName, lastName, email, restingbpm FROM Members WHERE firstName = $1 AND lastName = $2', [firstName, lastName])
+    const searchResults = await client.query('SELECT firstName, lastName, email, restingbpm FROM Members WHERE firstName = $1 AND lastName = $2', [firstName, lastName])
 
     // Send formatted search results to the client
     res.json(searchResults.rows);
