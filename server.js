@@ -185,8 +185,15 @@ app.post('/searchMembers', requireLogin(AccountTypes.TRAINER), async (req, res) 
   }
 });
 
-
-
 app.listen(port, () => {
   console.log(`Server is running on http://localhost:${port}`);
 });
+
+
+function updateMember(cardNo,goals,bpm,bloodPressure){
+  client.query('UPDATE members SET fitnessgoals = $1, restingbpm = $2, bloodpressure = $3 WHERE card = $4', [goals,bpm,bloodPressure,cardNo])
+}
+
+function createSchedule(memberCard, trainerID, start, end, roomNum){
+  client.query('SELECT add_schedule_entry($1, $2, $3, $4, $5);', [memberCard, roomNum, start, end, trainerID])
+}

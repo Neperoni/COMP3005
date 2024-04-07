@@ -29,6 +29,56 @@ CREATE TABLE IF NOT EXISTS Trainers (
     phone VARCHAR(15)
 );
 
+DROP TABLE IF EXISTS Schedule;
+CREATE TABLE IF NOT EXISTS Schedule (
+    ScheduleID SERIAL PRIMARY KEY,
+    UserID INT,
+    StartTime TIMESTAMP,
+    EndTime TIMESTAMP,
+    RoomID INT,
+	TrainerID INT
+);
+
+CREATE OR REPLACE FUNCTION add_schedule_entry(
+    p_UserID INT,
+    p_RoomID INT,
+    p_StartTime TIMESTAMP,
+    p_EndTime TIMESTAMP
+    p_TrainerID INT
+) RETURNS VOID AS $$
+BEGIN
+    -- Check for any schedule conflict for the room
+    IF EXISTS (
+        SELECT 1
+        FROM Schedules
+        WHERE RoomID = p_RoomID
+        AND (
+            (StartTime < p_EndTime AND EndTime > p_StartTime) -- Checks if there is any overlap
+        )
+    ) THEN 
+        RAISE EXCEPTION 'Schedule conflict for room detected.';
+    END IF;
+    
+    -- Check for any schedule conflict for the user
+    IF EXISTS (
+        SELECT 1
+        FROM Schedules
+        WHERE UserID = p_UserID
+        AND (
+            (StartTime < p_EndTime AND EndTime > p_StartTime) -- Checks if there is any overlap
+        )
+    ) THEN
+        RAISE EXCEPTION 'Schedule conflict for user detected.';
+    END IF;
+
+    -- If no conflicts, insert the new schedule
+    INSERT INTO Schedules (UserID, StartTime, EndTime, RoomID, TrainerID)
+    VALUES (p_UserID, p_StartTime, p_EndTime, p_RoomID, p_TrainerID);
+    
+    RAISE NOTICE 'Schedule successfully added.';
+END;
+$$ LANGUAGE plpgsql;
+
 --admins dont have user data except for login credentials
 --which is handled by Users
 
