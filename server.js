@@ -6,6 +6,7 @@ const path = require('path');
 const bodyParser = require('body-parser');
 const { Client, Pool } = require('pg');
 const { access } = require('fs');
+const { start } = require('repl');
 
 const app = express();
 
@@ -185,6 +186,92 @@ app.post('/searchMembers', requireLogin(AccountTypes.TRAINER), async (req, res) 
   }
 });
 
+
+app.post('/add_availability', requireLogin(AccountTypes.TRAINER), async (req, res) => {
+  try {
+    const { startTime, endTime, day } = req.body;
+    const email = req.session.user['email'];
+
+    // Validate data
+    if (validateTimeSlot(startTime,endTime)==false) {
+      return res.status(400).json({ error: 'Please provide valid startTime, endTime, and day.' });
+    }
+    const values = [email, day, startTime, endTime];
+    console.log(`Adding availability: "${values}`)
+
+    // Check if the availability already exists
+    //end time is not part of the primary key
+    const existingAvailability = await client.query(
+      'SELECT * FROM TrainerAvailabilitys WHERE email = $1 AND day = $2 AND start_time = $3',[email,day,startTime]);
+    if (existingAvailability.rows.length > 0) {
+      console.log("Availability already exists")
+      return res.status(400).json({ error: 'Availability already exists.' });
+    }
+
+    // Query database to insert availability
+    await client.query(`INSERT INTO TrainerAvailabilitys (email, day, start_time, end_time) VALUES ($1, $2, $3, $4)`,values);
+
+    res.status(200).json({ success: true });
+  } catch (error) {
+    console.error('Error adding availability:', error);
+    res.status(500).json({ error: 'Internal Server Error' });
+  }
+});
+
+app.post('/delete_availability', requireLogin(AccountTypes.TRAINER), async (req, res) => {
+  try {
+    const { start_time, end_time, day } = req.body;
+    const email = req.session.user['email'];
+
+    // Validate data
+    if (validateTimeSlot(start_time,end_time)==false) {
+      return res.status(400).json({ error: 'Please provide valid startTime, endTime, and day.' });
+    }
+
+    console.log(`Deleting availability: ${[day, start_time, end_time]}`)
+
+
+    // Query database to insert availability
+    const query = `
+      DELETE FROM TrainerAvailabilitys
+      WHERE email = $1 AND day = $2 AND start_time = $3 AND end_time = $4
+    `;
+    const values = [email, day, start_time, end_time];
+
+    // Execute query
+    await client.query(query, values);
+
+    res.status(200).json({ success: true });
+  } catch (error) {
+    console.error('Error deleting availability:', error);
+    res.status(500).json({ error: 'Internal Server Error' });
+  }
+});
+
+// Endpoint to fetch availabilities for a trainer
+app.get('/trainer_availabilities', requireLogin(AccountTypes.TRAINER), async (req, res) => {
+  try {
+    // Get the logged-in trainer's email from the session
+    const email = req.session.user['email'];
+
+    // Query database to fetch availabilities for the trainer
+    const query = `
+      SELECT day, start_time, end_time
+      FROM TrainerAvailabilitys
+      WHERE email = $1
+    `;
+    const { rows } = await client.query(query, [email]);
+
+    // Send the availabilities to the client
+    res.json(rows);
+  } catch (error) {
+    console.error('Error fetching trainer availabilities:', error);
+    res.status(500).json({ error: 'Internal Server Error' });
+  }
+});
+
+
+
 app.listen(port, () => {
   console.log(`Server is running on http://localhost:${port}`);
 });
@@ -194,6 +281,32 @@ function updateMember(cardNo,goals,bpm,bloodPressure){
   client.query('UPDATE members SET fitnessgoals = $1, restingbpm = $2, bloodpressure = $3 WHERE card = $4', [goals,bpm,bloodPressure,cardNo])
 }
 
+//ROOM SCHEDULE
 function createSchedule(memberCard, trainerID, start, end, roomNum){
   client.query('SELECT add_schedule_entry($1, $2, $3, $4, $5);', [memberCard, roomNum, start, end, trainerID])
+}
+
+// Function to validate the time slot
+function validateTimeSlot(startTime, endTime) {
+  // Parse start and end times
+  const [startHour, startMinute] = startTime.split(':').map(Number);
+  const [endHour, endMinute] = endTime.split(':').map(Number);
+
+  // Validate start and end times
+  if (isNaN(startHour) || isNaN(startMinute) || isNaN(endHour) || isNaN(endMinute)) {
+    return false; // Invalid format
+  }
+
+  // Check if hour and minute values are within range
+  if (startHour < 0 || startHour > 23 || startMinute < 0 || startMinute > 59 ||
+      endHour < 0 || endHour > 23 || endMinute < 0 || endMinute > 59) {
+    return false; // Out of range
+  }
+
+  // Time slots are valid if start time is before end time
+  if (startHour < endHour || (startHour === endHour && startMinute < endMinute)) {
+    return true;
+  } else {
+    return false;
+  }
 }

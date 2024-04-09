@@ -36,14 +36,26 @@ CREATE TABLE IF NOT EXISTS Schedule (
     StartTime TIMESTAMP,
     EndTime TIMESTAMP,
     RoomID INT,
-	TrainerID INT
+	email INT
+);
+
+DROP TABLE IF EXISTS TrainerAvailabilitys;
+CREATE TABLE IF NOT EXISTS TrainerAvailabilitys
+(
+    email VARCHAR(30) NOT NULL, 
+    day varchar(1),
+    start_time time,
+    end_time time,
+    primary key (email, day, start_time),
+    foreign key (email) references Trainers(email),
+    check (start_time < end_time)
 );
 
 CREATE OR REPLACE FUNCTION add_schedule_entry(
     p_UserID INT,
     p_RoomID INT,
     p_StartTime TIMESTAMP,
-    p_EndTime TIMESTAMP
+    p_EndTime TIMESTAMP,
     p_TrainerID INT
 ) RETURNS VOID AS $$
 BEGIN
@@ -115,16 +127,7 @@ create table Equipments
 --so also needs start time
 --convenient for displaying by soonness
 
-create table TrainerAvailabilitys
-(
-    trainerID integer,
-    day varchar(1),
-    start_time time,
-    end_time time,
-    primary key (trainerID, day, start_time),
-    foreign key (trainerID) references Trainer(trainerID),
-    check (start_time < end_time)
-);
+
 
 create table Schedule
 (

@@ -74,12 +74,12 @@ document.addEventListener('DOMContentLoaded', function () {
             console.error("Unknown account type: " + responseData.accountType);
             break;
         }
+      } else {
+        document.getElementById('loginErrorMessage').style.display = 'block'; // Display login error message
       }
-      
-      loginForm.reset(); // Reset the form after successful login
     } catch (error) {
       console.error('Error logging in:', error);
-      alert('Failed to login. Please try again later.');
+      alert('Failed to login. Please check email and password.');
     }
   });
 });

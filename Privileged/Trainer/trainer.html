@@ -23,10 +23,37 @@
       <!-- Manage schedule -->
       <h2>Manage Schedule</h2>
       <p>Set your available time slots:</p>
+      <p style="font-size: smaller;">(HH:MM), 24 hour clock</p>
       <!-- Input fields to set time slots -->
-      <!-- Example: -->
-      <input type="text" id="timeSlotInput" placeholder="Enter available time slot">
+      <input type="text" id="startTimeInput" placeholder="Enter start time">
+      <input type="text" id="endTimeInput" placeholder="Enter end time">
+      <select id="dayInput" class="input-field">
+        <option value="0">Sunday</option>
+        <option value="1">Monday</option>
+        <option value="2">Tuesday</option>
+        <option value="3">Wednesday</option>
+        <option value="4">Thursday</option>
+        <option value="5">Friday</option>
+        <option value="6">Saturday</option>
+      </select>
       <button onclick="addTimeSlot()">Add</button>
+
+      <button id="refreshButton">Refresh</button>
+
+      <!-- Table to display current availabilities -->
+      <table id="availabilityTable">
+        <thead>
+          <tr>
+            <th>Day</th>
+            <th>Start Time</th>
+            <th>End Time</th>
+            <th>Action</th>
+          </tr>
+        </thead>
+        <tbody id="availabilityBody">
+          <!-- Table rows will be dynamically filled by JavaScript -->
+        </tbody>
+      </table>
     </div>
   </div>
 

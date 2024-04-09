@@ -1,70 +1,87 @@
 /* styles.css */
 /* Apply styles to the container */
 .container {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    height: 100vh;
-    background-color: #aed7ff; /* Brighter blue background */
-  }
-  
-  .dashboard-box {
-    padding: 20px;
-    border: 2px solid #0b629c; /* Darker blue border */
-    border-radius: 10px;
-    background-color: #e3f0fd; /* Lighter blue background */
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); /* Add shadow for depth */
-  }
-  
-  /* Additional styles for elements inside the dashboard-box can be added here */
-  
-  /* Additional styles for other dashboard elements */
-  
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 100vh; /* Use min-height instead of height */
+  background-color: #aed7ff; /* Brighter blue background */
+  overflow-y: auto; /* Enable vertical scrolling when needed */
+}
+
+.dashboard-box {
+  padding: 20px;
+  border: 2px solid #0b629c; /* Darker blue border */
+  border-radius: 10px;
+  background-color: #e3f0fd; /* Lighter blue background */
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); /* Add shadow for depth */
+}
+
+/* Additional styles for elements inside the dashboard-box can be added here */
+
+/* Additional styles for other dashboard elements */
+
 body {
-    font-family: Arial, sans-serif;
-    background-color: #f0f0f0;
-    color: #333;
-    margin: 0;
-    padding: 0;
-  }
-  
-  h1, h2 {
-    color: #085280; /* Nice shade of blue */
-  }
-  
-  input[type="text"], button {
-    padding: 8px;
-    font-size: 16px;
-    border: none;
-    border-radius: 4px;
-  }
-  
-  button {
-    background-color: #085280; /* Nice shade of blue */
-    color: white;
-    cursor: pointer;
-  }
-  
-  button:hover {
-    background-color: #0a6da3; /* Darker shade of blue on hover */
-  }
-  
-  table {
-    border-collapse: collapse;
-    width: 100%;
-  }
-  
-  table, th, td {
-    border: 1px solid #ddd;
-    padding: 8px;
-  }
-  
-  th {
-    background-color: #085280; /* Nice shade of blue */
-    color: white;
-  }
-  
-  tr:nth-child(even) {
-    background-color: #f2f2f2;
-  }
-  
+  font-family: Arial, sans-serif;
+  background-color: #f0f0f0;
+  color: #333;
+  margin: 0;
+  padding: 0;
+}
+
+h1, h2 {
+  color: #085280; /* Nice shade of blue */
+}
+
+input[type="text"], button, .input-field {
+  padding: 8px;
+  font-size: 16px;
+  border: none;
+  border-radius: 4px;
+}
+
+.input-field {
+  width: 200px; /* Specify the desired width */
+  margin-bottom: 10px; /* Add some space below the input field */
+}
+
+button {
+  background-color: #085280; /* Nice shade of blue */
+  color: white;
+  cursor: pointer;
+}
+
+button:hover {
+  background-color: #0a6da3; /* Darker shade of blue on hover */
+}
+
+table {
+  border-collapse: collapse;
+  width: 100%;
+}
+
+table, th, td {
+  border: 1px solid #ffffff;
+  padding: 8px;
+}
+
+th {
+  background-color: #085280; /* Nice shade of blue */
+  color: rgb(255, 255, 255);
+}
+
+tr:nth-child(even) {
+  background-color: #ffffff;
+}
+
+/* Updated styles for list items */
+li {
+  background-color: #f5f5f5; /* Light gray background */
+  padding: 10px;
+  margin-bottom: 5px;
+  border-radius: 4px;
+}
+
+li:hover {
+  background-color: #e0e0e0; /* Lighter gray background on hover */
+}

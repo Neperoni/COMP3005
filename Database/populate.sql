@@ -10,5 +10,7 @@ INSERT INTO Members (email, firstName, lastName, card, fitnessGoals, restingbpm,
 ('member2@example.com', 'Jane', 'Doe', 1234567890123457, 'Live Actively', 70, 140);
 INSERT INTO Members (email, firstName, lastName, card, fitnessGoals, restingbpm, bloodpressure) VALUES
 ('user1@example.com', 'Jim', 'Doe', 1234567890123466, 'Get Shredded', 40, 110);
+INSERT INTO Members (email, firstName, lastName, card, fitnessGoals, restingbpm, bloodpressure) VALUES
+('default@example.com', 'Jim', 'Dough', 1234567890123466, 'Get Porky', 40, 110);
 
 INSERT INTO Trainers (email, name, phone) VALUES ('trainer1@example.com', 'Alice', '555-0101');
