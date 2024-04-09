@@ -17,9 +17,17 @@ CREATE TABLE IF NOT EXISTS Members (
     firstName VARCHAR(15) NOT NULL,
     lastName VARCHAR(15) NOT NULL,
     card NUMERIC(16,0) NOT NULL,
-    fitnessGoals TEXT,
     restingbpm REAL,
     bloodpressure REAL
+);
+
+DROP TABLE IF EXISTS ExerciseGoals;
+CREATE TABLE IF NOT EXISTS ExerciseGoals (
+    goal_id SERIAL PRIMARY KEY,
+    email VARCHAR(30) NOT NULL,
+    exercise TEXT NOT NULL,
+    goal TEXT NOT NULL,
+    FOREIGN KEY (email) REFERENCES Members(email)
 );
 
 DROP TABLE IF EXISTS Trainers;

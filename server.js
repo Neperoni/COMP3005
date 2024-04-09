@@ -35,11 +35,11 @@ const client = new Client({
 });
 
 client.connect().then(() => {
-      console.log('Connected to PostgreSQL database');
-    })
-    .catch((err) => {
-      console.error('Error connecting to PostgreSQL database', err);
-    });
+  console.log('Connected to PostgreSQL database');
+})
+  .catch((err) => {
+    console.error('Error connecting to PostgreSQL database', err);
+  });
 
 
 // Serve static files from the "Public" directory
@@ -83,7 +83,7 @@ app.post('/login', async (req, res) => {
     console.log("redirect to profile")
 
     res.status(200).json({ accountType: accountType, message: 'Login successful. Redirecting to profile page.' });
-    
+
   } catch (error) {
     console.error('Error logging in:', error);
     res.status(500).json({ error: 'Internal Server Error' });
@@ -93,9 +93,9 @@ app.post('/login', async (req, res) => {
 
 // Route to add a new user
 app.post('/register', async (req, res) => {
-  const { email, password, card , firstName, lastName} = req.body;
+  const { email, password, card, firstName, lastName } = req.body;
   try {
-    
+
     console.log(`register request: ${email} ${password} ${card}`);
     //data validation
     if (!(email && password && card && firstName && lastName)) {
@@ -147,12 +147,12 @@ app.post('/register', async (req, res) => {
 });
 
 function requireLogin(accountType) {
-  return function(req, res, next) {
+  return function (req, res, next) {
     if (req.session && req.session.user) {
       // User is logged in
-      
+
       const { accountType: userAccountType } = req.session.user;
-      
+
       if (userAccountType === accountType) {
         // User account type matches the required account type, proceed
         next();
@@ -169,7 +169,130 @@ function requireLogin(accountType) {
 
 
 
-//trainer functions
+//---------------------------------------------------------------MEMBER FUNCTIONS--------------------
+
+app.get('/user_info', requireLogin(AccountTypes.MEMBER), async (req, res) => {
+  try {
+    const email = req.session.user['email'];
+
+    console.log(`Fetching user data ${[email]}`);
+
+    // Query database to fetch user data
+    let query = `
+      SELECT firstName, lastName, card, restingBPM, bloodpressure FROM Members WHERE email = $1
+    `;
+    let values = [email];
+    let result = await client.query(query, values);
+
+    // Query database to fetch exercise goals
+    query = `
+      SELECT exercise, goal, goal_id FROM ExerciseGoals WHERE email = $1
+    `;
+    let exerciseGoalsResult = await client.query(query, values);
+    let exercisegoals = exerciseGoalsResult.rows;
+
+    // Extract user information from the query result
+    const userInfo = result.rows[0]; // Assuming only one row is returned
+
+    // Combine user information with exercise goals
+    const userDataWithGoals = { ...userInfo, exercisegoals };
+
+    res.status(200).json(userDataWithGoals);
+  } catch (error) {
+    console.error('Error getting data:', error);
+    res.status(500).json({ error: 'Internal Server Error' });
+  }
+});
+
+app.post('/update_info', requireLogin(AccountTypes.MEMBER), async (req, res) => {
+  try {
+    const { firstName, lastName, card, fitnessGoals, restingBPM, bloodpressure } = req.body;
+    const email = req.session.user['email'];
+
+    console.log(`Updating user info for ${email}`);
+
+    // Query to update user information
+    const query = `
+      UPDATE Members 
+      SET firstName = $1, lastName = $2, card = $3, fitnessGoals = $4, restingBPM = $5, bloodpressure = $6
+      WHERE email = $7
+    `;
+    const values = [firstName, lastName, card, fitnessGoals, restingBPM, bloodpressure, email];
+
+    // Execute the update query
+    await client.query(query, values);
+
+    res.status(200).json({ success: true });
+  } catch (error) {
+    console.error('Error updating data:', error);
+    res.status(500).json({ error: 'Internal Server Error' });
+  }
+});
+
+// Endpoint to add a fitness goal to the user's profile
+app.post('/add_fitness_goal', requireLogin(AccountTypes.MEMBER), async (req, res) => {
+  try {
+    const email = req.session.user['email'];
+    const { exercise, goal } = req.body; // Assuming the client sends the exercise and goal in the request body
+
+    // Check if exercise and goal are provided
+    if (!exercise || !goal) {
+      return res.status(400).json({ error: 'Exercise and goal are required.' });
+    }
+
+    console.log(`Adding user goal ${[email, exercise, goal]}`);
+
+    // Insert the new fitness goal into the ExerciseGoals table
+    const query = `
+      INSERT INTO ExerciseGoals (email, exercise, goal) VALUES ($1, $2, $3) RETURNING goal_id;
+    `;
+    const values = [email, exercise, goal];
+    result = await client.query(query, values);
+    
+    const insertedGoalId = result.rows[0].goal_id;
+    res.status(200).json({ success: true, goal_id: insertedGoalId });
+
+  } catch (error) {
+    console.error('Error adding fitness goal:', error);
+    res.status(500).json({ error: 'Internal Server Error' });
+  }
+});
+
+// Endpoint to delete a fitness goal from the user's profile
+app.delete('/delete_fitness_goal', requireLogin(AccountTypes.MEMBER), async (req, res) => {
+  try {
+    const email = req.session.user['email'];
+    const { goal_id } = req.body; // Assuming the client sends the goalID to delete in the request body
+
+
+    // Check if goalID is provided
+    if (!goal_id) {
+      return res.status(400).json({ error: 'goalID is required.' });
+    }
+    console.log(`Deleting user goal ${[email, goal_id]}`);
+
+    // Delete the fitness goal from the ExerciseGoals table based on goalID
+    const query = `
+      DELETE FROM ExerciseGoals WHERE email = $1 AND goal_id = $2
+    `;
+    const values = [email, goal_id];
+    await client.query(query, values);
+
+    res.status(200).json({ success: true });
+  } catch (error) {
+    console.error('Error deleting fitness goal:', error);
+    res.status(500).json({ error: 'Internal Server Error' });
+  }
+});
+
+
+
+
+
+
+
+
+//trainer functions---------------------------------------------TRAINER FUNCTIONS----------------------------------------------------
 app.post('/searchMembers', requireLogin(AccountTypes.TRAINER), async (req, res) => {
   const { firstName, lastName } = req.body;
 
@@ -193,7 +316,7 @@ app.post('/add_availability', requireLogin(AccountTypes.TRAINER), async (req, re
     const email = req.session.user['email'];
 
     // Validate data
-    if (validateTimeSlot(startTime,endTime)==false) {
+    if (validateTimeSlot(startTime, endTime) == false) {
       return res.status(400).json({ error: 'Please provide valid startTime, endTime, and day.' });
     }
     const values = [email, day, startTime, endTime];
@@ -202,14 +325,14 @@ app.post('/add_availability', requireLogin(AccountTypes.TRAINER), async (req, re
     // Check if the availability already exists
     //end time is not part of the primary key
     const existingAvailability = await client.query(
-      'SELECT * FROM TrainerAvailabilitys WHERE email = $1 AND day = $2 AND start_time = $3',[email,day,startTime]);
+      'SELECT * FROM TrainerAvailabilitys WHERE email = $1 AND day = $2 AND start_time = $3', [email, day, startTime]);
     if (existingAvailability.rows.length > 0) {
       console.log("Availability already exists")
       return res.status(400).json({ error: 'Availability already exists.' });
     }
 
     // Query database to insert availability
-    await client.query(`INSERT INTO TrainerAvailabilitys (email, day, start_time, end_time) VALUES ($1, $2, $3, $4)`,values);
+    await client.query(`INSERT INTO TrainerAvailabilitys (email, day, start_time, end_time) VALUES ($1, $2, $3, $4)`, values);
 
     res.status(200).json({ success: true });
   } catch (error) {
@@ -224,7 +347,7 @@ app.post('/delete_availability', requireLogin(AccountTypes.TRAINER), async (req,
     const email = req.session.user['email'];
 
     // Validate data
-    if (validateTimeSlot(start_time,end_time)==false) {
+    if (validateTimeSlot(start_time, end_time) == false) {
       return res.status(400).json({ error: 'Please provide valid startTime, endTime, and day.' });
     }
 
@@ -277,12 +400,12 @@ app.listen(port, () => {
 });
 
 
-function updateMember(cardNo,goals,bpm,bloodPressure){
-  client.query('UPDATE members SET fitnessgoals = $1, restingbpm = $2, bloodpressure = $3 WHERE card = $4', [goals,bpm,bloodPressure,cardNo])
+function updateMember(cardNo, goals, bpm, bloodPressure) {
+  client.query('UPDATE members SET fitnessgoals = $1, restingbpm = $2, bloodpressure = $3 WHERE card = $4', [goals, bpm, bloodPressure, cardNo])
 }
 
 //ROOM SCHEDULE
-function createSchedule(memberCard, trainerID, start, end, roomNum){
+function createSchedule(memberCard, trainerID, start, end, roomNum) {
   client.query('SELECT add_schedule_entry($1, $2, $3, $4, $5);', [memberCard, roomNum, start, end, trainerID])
 }
 
@@ -299,7 +422,7 @@ function validateTimeSlot(startTime, endTime) {
 
   // Check if hour and minute values are within range
   if (startHour < 0 || startHour > 23 || startMinute < 0 || startMinute > 59 ||
-      endHour < 0 || endHour > 23 || endMinute < 0 || endMinute > 59) {
+    endHour < 0 || endHour > 23 || endMinute < 0 || endMinute > 59) {
     return false; // Out of range
   }
 

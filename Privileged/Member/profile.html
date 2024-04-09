@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Member Profile</title>
+    <link rel="stylesheet" href="styles.css"><!-- public styles -->
+</head>
+
+<body>
+    <div class="container">
+        <div class="dashboard-box"> <!-- Wrap the Member Dashboard in a box -->
+            <h1>Member Profile</h1>
+
+            <!-- Profile Information -->
+            <h2>Profile Information</h2>
+            <ul>
+                <li>
+                    <div class="label-container">
+                        <label for="firstNameInput">First Name:</label>
+                        <div class="input-container">
+                            <input type="text" id="firstNameInput" maxlength="30">
+                        </div>
+                    </div>
+                </li>
+                <li>
+                    <div class="label-container">
+                        <label for="lastNameInput">Last Name:</label>
+                        <div class="input-container">
+                            <input type="text" id="lastNameInput" maxlength="30">
+                        </div>
+                    </div>
+                </li>
+                <li>
+                    <div class="label-container">
+                        <label for="cardInput">Card Number:</label>
+                        <div class="input-container">
+                            <input type="text" id="cardInput" maxlength="16">
+                        </div>
+                    </div>
+                </li>
+            </ul>
+
+            <!-- Health Metrics -->
+            <h2>Health Metrics</h2>
+            <ul>
+                <li>
+                    <div class="label-container">
+                        <label for="restingBPMInput">Resting BPM:</label>
+                        <div class="input-container">
+                            <input type="text" id="restingBPMInput" maxlength="30">
+                        </div>
+                    </div>
+                </li>
+                <li>
+                    <div class="label-container">
+                        <label for="bloodPressureInput">Blood Pressure:</label>
+                        <div class="input-container">
+                            <input type="text" id="bloodPressureInput" maxlength="30">
+                        </div>
+                    </div>
+                </li>
+            </ul>
+            <!-- Save Button -->
+            <button id="saveButton">Save</button>
+
+
+            <h2>Fitness Goals</h2>
+
+            <!-- Enclosing div with a border -->
+            <div style="border: 2px solid #007bff; padding: 10px; margin-bottom: 20px;">
+
+                <!-- New Fitness Goal Input Fields -->
+                <div>
+                    <label for="newExerciseInput" style="font-weight: bold;">Exercise:</label>
+                    <input type="text" id="newExerciseInput" maxlength="20"
+                        style="width: 150px; display: inline-block; margin-right: 10px;">
+                    <label for="newGoalInput" style="font-weight: bold;">Goal:</label>
+                    <input type="text" id="newGoalInput" maxlength="30" style="width: 250px; display: inline-block;">
+                    <button id="addGoalButton">Add Goal</button>
+                </div>
+            </div>
+
+            <table id="exercisegoalsTable">
+                <thead>
+                    <tr>
+                        <th style="width: 30%;">Exercise</th> <!-- Adjust width for Exercise column -->
+                        <th style="width: 70%;">Goal</th> <!-- Adjust width for Goal column -->
+                        <th style="width: 70%;">Action</th> <!-- Adjust width for Goal column -->
+                    </tr>
+                </thead>
+                <tbody>
+                    <!-- Table rows will be dynamically filled by JavaScript -->
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <script src="profile.js"></script>
+</body>
+
+</html>
