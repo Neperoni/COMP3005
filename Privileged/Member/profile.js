@@ -1,7 +1,7 @@
 
 
 
-let exercisegoals = []
+let exercise = []
 let userInfo = {}
 
 // Function to fetch user information when the page loads
@@ -9,8 +9,9 @@ async function fetchUserInfo() {
     try {
         const response = await fetch('/user_info');
         if (response.ok) {
-            userInfo = await response.json();
-            exercisegoals = userInfo.exercisegoals
+            let {exercisegoals, ...info} = await response.json();
+            exercise = exercisegoals
+            userInfo = info
             DisplayInfo();
             DisplayFitness()
 
@@ -37,7 +38,7 @@ function DisplayFitness() {
     const tbody = exercisegoalsTable.getElementsByTagName('tbody')[0];
     tbody.innerHTML = ''; // Clear existing rows
     
-    exercisegoals.forEach(goal => {
+    exercise.forEach(goal => {
         const row = tbody.insertRow();
         const exerciseCell = row.insertCell(0);
         const goalCell = row.insertCell(1);
@@ -49,7 +50,7 @@ function DisplayFitness() {
         // Create delete button
         const deleteButton = document.createElement('button');
         deleteButton.textContent = 'Delete';
-        deleteButton.addEventListener('click', () => deleteFitnessGoal(goal.goal_id)); // Call deleteFitnessGoal function on button click
+        deleteButton.addEventListener('click', () => deleteFitnessGoal(goal)); // Call deleteFitnessGoal function on button click
         
         // Append delete button to deleteCell
         deleteCell.appendChild(deleteButton);
@@ -107,9 +108,8 @@ async function addFitnessGoal() {
 
         if (response.ok) {
             console.log('Fitness goal added successfully.');
-            goal_id = response.body.goal_id
             //DISPLAY FITNESS GOALS
-            exercisegoals.push({exercise,goal, goal_id})
+            exercise.push({exercise,goal})
             DisplayFitness()
 
         } else {
@@ -124,20 +124,20 @@ async function addFitnessGoal() {
 
 
 // Function to delete a fitness goal
-async function deleteFitnessGoal(goal_id) {
+async function deleteFitnessGoal(goal) {
     try {
         const response = await fetch('/delete_fitness_goal', {
             method: 'DELETE',
             headers: {
                 'Content-Type': 'application/json'
             },
-            body: JSON.stringify({ goal_id })
+            body: JSON.stringify(goal)
         });
 
         if (response.ok) {
             console.log('Fitness goal deleted successfully.');
             // Remove the deleted goal from the array and update the UI
-            exercisegoals = exercisegoals.filter(goal => goal.goal_id !== goal_id);
+            exercise = exercise.filter(filterGoal => filterGoal.exercise !== goal.exercise && filterGoal.goal !== goal.goal);
             DisplayFitness();
         } else {
             console.error('Failed to delete fitness goal:', response.statusText);

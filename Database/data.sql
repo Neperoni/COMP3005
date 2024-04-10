@@ -23,10 +23,10 @@ CREATE TABLE IF NOT EXISTS Members (
 
 DROP TABLE IF EXISTS ExerciseGoals;
 CREATE TABLE IF NOT EXISTS ExerciseGoals (
-    goal_id SERIAL PRIMARY KEY,
     email VARCHAR(30) NOT NULL,
     exercise TEXT NOT NULL,
     goal TEXT NOT NULL,
+    PRIMARY KEY (email, exercise, goal),
     FOREIGN KEY (email) REFERENCES Members(email)
 );
 

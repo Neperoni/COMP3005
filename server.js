@@ -186,7 +186,7 @@ app.get('/user_info', requireLogin(AccountTypes.MEMBER), async (req, res) => {
 
     // Query database to fetch exercise goals
     query = `
-      SELECT exercise, goal, goal_id FROM ExerciseGoals WHERE email = $1
+      SELECT exercise, goal FROM ExerciseGoals WHERE email = $1
     `;
     let exerciseGoalsResult = await client.query(query, values);
     let exercisegoals = exerciseGoalsResult.rows;
@@ -204,20 +204,31 @@ app.get('/user_info', requireLogin(AccountTypes.MEMBER), async (req, res) => {
   }
 });
 
+function isNumeric(str) {
+  if (typeof str != "string") return false // we only process strings!  
+  return !isNaN(str) && // use type coercion to parse the _entirety_ of the string (`parseFloat` alone does not do this)...
+         !isNaN(parseFloat(str)) // ...and ensure strings of whitespace fail
+}
+
 app.post('/update_info', requireLogin(AccountTypes.MEMBER), async (req, res) => {
   try {
-    const { firstName, lastName, card, fitnessGoals, restingBPM, bloodpressure } = req.body;
+    const {firstname, lastname, card, restingbpm, bloodpressure } = req.body;
     const email = req.session.user['email'];
 
     console.log(`Updating user info for ${email}`);
 
+    // Check if exercise and goal are provided
+    if (!firstname || !lastname || !card || !restingbpm || !bloodpressure || !isNumeric(card) || !isNumeric(restingbpm) || !isNumeric(bloodpressure)) {
+      return res.status(400).json({ error: 'Exercise and goal are required.' });
+    }
+    const values = [firstname, lastname, card, restingbpm, bloodpressure, email];
+
     // Query to update user information
     const query = `
       UPDATE Members 
-      SET firstName = $1, lastName = $2, card = $3, fitnessGoals = $4, restingBPM = $5, bloodpressure = $6
-      WHERE email = $7
+      SET firstName = $1, lastName = $2, card = $3, restingBPM = $4, bloodpressure = $5
+      WHERE email = $6
     `;
-    const values = [firstName, lastName, card, fitnessGoals, restingBPM, bloodpressure, email];
 
     // Execute the update query
     await client.query(query, values);
@@ -232,25 +243,32 @@ app.post('/update_info', requireLogin(AccountTypes.MEMBER), async (req, res) => 
 // Endpoint to add a fitness goal to the user's profile
 app.post('/add_fitness_goal', requireLogin(AccountTypes.MEMBER), async (req, res) => {
   try {
-    const email = req.session.user['email'];
     const { exercise, goal } = req.body; // Assuming the client sends the exercise and goal in the request body
-
+    
     // Check if exercise and goal are provided
     if (!exercise || !goal) {
       return res.status(400).json({ error: 'Exercise and goal are required.' });
     }
+    const email = req.session.user['email'];
+    const values = [email, exercise, goal];
 
     console.log(`Adding user goal ${[email, exercise, goal]}`);
+    
+    const checkQuery = `
+      SELECT * FROM ExerciseGoals WHERE email = $1 AND exercise = $2 AND goal = $3;
+    `;
+    const checkResult = await client.query(checkQuery, values);
+    if (checkResult.rows.length > 0) {
+      return res.status(400).json({ error: 'Already exists.' });
+    }
 
     // Insert the new fitness goal into the ExerciseGoals table
     const query = `
-      INSERT INTO ExerciseGoals (email, exercise, goal) VALUES ($1, $2, $3) RETURNING goal_id;
+      INSERT INTO ExerciseGoals (email, exercise, goal) VALUES ($1, $2, $3);
     `;
-    const values = [email, exercise, goal];
-    result = await client.query(query, values);
+    await client.query(query, values);
     
-    const insertedGoalId = result.rows[0].goal_id;
-    res.status(200).json({ success: true, goal_id: insertedGoalId });
+    res.status(200).json({ success: true});
 
   } catch (error) {
     console.error('Error adding fitness goal:', error);
@@ -262,20 +280,19 @@ app.post('/add_fitness_goal', requireLogin(AccountTypes.MEMBER), async (req, res
 app.delete('/delete_fitness_goal', requireLogin(AccountTypes.MEMBER), async (req, res) => {
   try {
     const email = req.session.user['email'];
-    const { goal_id } = req.body; // Assuming the client sends the goalID to delete in the request body
+    const {exercise, goal} = req.body;
 
-
-    // Check if goalID is provided
-    if (!goal_id) {
-      return res.status(400).json({ error: 'goalID is required.' });
+    if (!exercise || !goal) {
+      return res.status(400).json({ error: 'Exercise and goal are required.' });
     }
-    console.log(`Deleting user goal ${[email, goal_id]}`);
+
+    console.log(`Deleting user goal ${[email, exercise, goal]}`);
 
     // Delete the fitness goal from the ExerciseGoals table based on goalID
     const query = `
-      DELETE FROM ExerciseGoals WHERE email = $1 AND goal_id = $2
+      DELETE FROM ExerciseGoals WHERE email = $1 AND exercise = $2 AND goal = $3
     `;
-    const values = [email, goal_id];
+    const values = [email, exercise, goal];
     await client.query(query, values);
 
     res.status(200).json({ success: true });
