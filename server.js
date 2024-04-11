@@ -560,6 +560,37 @@ app.get('/fetch_user_bookings', requireLogin(AccountTypes.MEMBER), async (req, r
   }
 });
 
+
+// Endpoint to create a session for a member
+app.post('/create_session_member', requireLogin(AccountTypes.MEMBER), async (req, res) => {
+  try {
+      const { trainername, description, start_time, end_time, date } = req.body;
+      const memberEmail = req.session.user.email;
+
+      // Validate data
+      if (!trainername || !description || !start_time || !end_time || !date) {
+          return res.status(400).json({ error: 'Please provide valid name, description, start time, end time, and date.' });
+      }
+
+      // Check if the session already exists
+      // You can add your own logic here if necessary
+
+      // Insert the session into the database
+      const insertQuery = `
+          INSERT INTO Sessions (trainer_name, member_email, session_date, start_time, end_time, description)
+          VALUES ($1, $2, $3, $4, $5, $6)
+      `;
+
+      const values = [name, memberEmail, date, start_time, end_time, description];
+      await client.query(insertQuery, values);
+
+      res.status(200).json({ success: true });
+  } catch (error) {
+      console.error('Error creating session for member:', error);
+      res.status(500).json({ error: 'Internal Server Error' });
+  }
+});
+
 //trainer functions---------------------------------------------TRAINER FUNCTIONS----------------------------------------------------
 app.post('/searchMembers', requireLogin(AccountTypes.TRAINER), async (req, res) => {
   const { firstName, lastName } = req.body;
@@ -701,3 +732,50 @@ function validateTimeSlot(startTime, endTime) {
     return false;
   }
 }
+
+
+//--------------------------------------------------ADMIN FUNCTIONS
+
+
+// Endpoint to fetch trainer availabilities for a specific date
+app.post('/fetch_trainer_availabilities', requireLogin(AccountTypes.ADMIN), async (req, res) => {
+  try {
+    const { date } = req.body;
+    //const email = req.session.user['email'];
+
+    // Validate data
+    if (!date) {
+      return res.status(400).json({ error: 'Please provide a valid date.' });
+    }
+
+    const [year, month, day] = date.split('-');
+        
+    //this is retarded, why does Date(2024-04-14) give you 2024-04-13
+    const parsedDate = new Date(date+"T00:00:00");
+    
+    // Check if the parsing was successful
+    if (parsedDate === "Invalid Date") {
+      return res.status(400).json({ error: 'Invalid date format. Please provide a valid date.' });
+    }
+
+    let dayOfWeek = parsedDate.getDay();
+
+
+    // Query database to fetch trainer availabilities for the specified date
+    const query = `
+    SELECT t.name, a.start_time, a.end_time
+    FROM TrainerAvailabilitys a
+    JOIN Trainers t ON a.email = t.email
+    WHERE a.day = $1;    
+    `;
+
+    const values = [dayOfWeek];
+    const availabilities = await client.query(query, values);
+
+    res.status(200).json({ availabilities: availabilities.rows });
+  } catch (error) {
+    console.error('Error fetching trainer availabilities:', error);
+    res.status(500).json({ error: 'Internal Server Error' });
+  }
+});
+

@@ -8,3 +8,41 @@
     background-color: #ccfffc;
   }
 
+/* Style for the form fields */
+input[type="date"],
+input[type="text"] {
+    background-color: rgb(218, 232, 255); /* Set the background color to white */
+    border: 1px solid #716565; /* Add a border */
+    border-radius: 5px; /* Add some border radius for a rounded appearance */
+    padding: 8px; /* Add padding for better spacing */
+    margin-bottom: 10px; /* Add margin at the bottom for spacing between fields */
+    max-width: 200px
+}
+
+/* Style for the submit button */
+button[type="submit"] {
+    background-color: #007bff; /* Set the background color of the button */
+    color: white; /* Set the text color to white */
+    border: none; /* Remove the border */
+    border-radius: 5px; /* Add border radius */
+    padding: 10px 20px; /* Add padding */
+    cursor: pointer; /* Change cursor to pointer on hover */
+}
+
+/* Style for the table */
+#availabilityTable {
+    border-collapse: collapse; /* Collapse border spacing */
+    width: 100%; /* Set table width to 100% */
+}
+
+#availabilityTable th,
+#availabilityTable td {
+    border: 1px solid #ddd; /* Add borders to table cells */
+    padding: 8px; /* Add padding */
+    text-align: left; /* Align text to the left */
+}
+
+#availabilityTable th {
+    background-color: #007bff; /* Set background color for table header */
+    color: white; /* Set text color for table header */
+}

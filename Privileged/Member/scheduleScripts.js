@@ -123,3 +123,5 @@ function leaveSession(bookingID) {
 document.addEventListener("DOMContentLoaded", function() {
     fetchUserSchedule();
 });
+
+

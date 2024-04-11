@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>User Profile</title>
+  <link rel="stylesheet" href="styles.css"> <!-- Include your stylesheet -->
+</head>
+<body>
+  <h1>Admin Profile</h1>
+  <div id="profileInfo">
+    <!-- Profile information will be displayed here -->
+  </div>
+
+
+  <h1>Schedule Personal Training Session</h1>
+  <form id="scheduleForm">
+      <label for="sessionDate">Select Date:</label>
+      <input type="date" id="sessionDate" name="sessionDate">
+      <br>
+      <label for="sessionName">Session Name:</label>
+      <input type="text" id="sessionName" name="sessionName">
+      <br>
+      <label for="sessionDescription">Session Description:</label>
+      <input type="text" id="sessionDescription" name="sessionDescription">
+      <br>
+      <button type="submit">View Available Trainers and Time Slots</button>
+  </form>
+
+  <div id="availabilityContainer">
+    <h2>Trainer Availability on Selected Date</h2>
+    <table id="availabilityTable">
+        <thead>
+            <tr>
+                <th>Trainer Name</th>
+                <th>Start Time</th>
+                <th>End Time</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody id="availabilityTableBody">
+            <!-- Trainer availability rows will be dynamically inserted here -->
+        </tbody>
+    </table>
+</div>
+
+<div id="availableTrainers"></div>
+  
+  <script src="adminScripts.js"></script> <!-- Include your JavaScript file -->
+</body>
+</html>
