@@ -126,14 +126,14 @@ CREATE TABLE Participants (
     FOREIGN KEY (memberemail) REFERENCES Users(email) ON DELETE CASCADE
 );
 
-/*
+
 
 create table Equipments
 (
     equipmentID serial,
     equipName varchar(30) unique,
     lastService date,
-    room varchar(10),
+    room INTEGER NOT NULL,
     servicePeriod integer,
     companyName varchar(40),
     companyEmail varchar(40),
@@ -142,6 +142,7 @@ create table Equipments
     primary key (equipmentID)
 );
 
+/*
 --trainers have several availability windows
 --so we need a one to many relationship
 --if there are two windows on the same day then trainerID and day is not unique enough
