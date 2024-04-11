@@ -14,3 +14,7 @@ INSERT INTO Members (email, firstName, lastName, card, fitnessGoals, restingbpm,
 ('default@example.com', 'Jim', 'Dough', 1234567890123466, 'Get Porky', 40, 110);
 
 INSERT INTO Trainers (email, name, phone) VALUES ('trainer1@example.com', 'Alice', '555-0101');
+
+
+INSERT INTO ExerciseRoutine (email, exercisename, exerciseinstructions) 
+VALUES ('member1@example.com', 'PUSHUPS', 'REPS: 30, SETS: 30');

@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Exercise Routines</title>
+    <link rel="stylesheet" href="exercisestyles.css"><!-- public styles -->
+    <style>
+        /* Add custom styles for exercise.html here */
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <div class="dashboard-box"> <!-- Wrap the Exercise Dashboard in a box -->
+            <h1>Exercise Routines</h1>
+
+
+            <!-- Form to add a new exercise -->
+            <div class="add-exercise-form">
+                <h2>Add New Exercise</h2>
+                <div class="input-group">
+                    <label for="exerciseName" style="width: 50px;">Exercise Name:</label>
+                    <input type="text" id="exerciseName" class="small-input" style="width: calc(50% - 70px);">
+                </div>
+                <div class="input-group">
+                    <label for="exerciseInstructions" style="width: 50px;">Exercise Instructions:</label>
+                    <input type="text" id="exerciseInstructions" class="small-input" style="width: calc(50% - 70px);">
+                </div>
+                <button onclick="addNewExercise()">Add Exercise</button>
+            </div>
+
+            <table id="exerciseTable">
+                <thead>
+                    <tr>
+                        <th>Exercise Name</th>
+                        <th></th>
+                        <!-- Use JavaScript to generate the last 7 days from today as table headers -->
+                    </tr>
+                </thead>
+                <tbody>
+                    <!-- Exercise rows will be dynamically added here -->
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <script src="exerciseScripts.js"></script><!-- Your JavaScript file for exercise.html -->
+</body>
+
+</html>

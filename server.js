@@ -240,6 +240,8 @@ app.post('/update_info', requireLogin(AccountTypes.MEMBER), async (req, res) => 
   }
 });
 
+
+
 // Endpoint to add a fitness goal to the user's profile
 app.post('/add_fitness_goal', requireLogin(AccountTypes.MEMBER), async (req, res) => {
   try {
@@ -302,11 +304,162 @@ app.delete('/delete_fitness_goal', requireLogin(AccountTypes.MEMBER), async (req
   }
 });
 
+//EXERCISE ROUTINES
+
+/*
+const exerciseHistoryData = [
+  { 
+    name: "Glute Ridge",
+    instructions: "REPS: 5, SETS:3, lift body straight",
+    history: [
+      { day: 1, progress: 2, difficulty: 5 },
+      { day: 2, progress: 3, difficulty: 4 },
+      { day: 3, progress: 4, difficulty: 3 },
+      { day: 4, progress: 5, difficulty: 2 },
+      { day: 5, progress: 3, difficulty: 4 },
+      { day: 6, progress: 4, difficulty: 3 },
+      { day: 7, progress: 5, difficulty: 2 }
+    ]
+  }
+  // Add more exercise history data as needed
+];
+*/
+
+app.get('/fetch_exercises', requireLogin(AccountTypes.MEMBER), async (req, res) => {
+  try {
+    const email = req.session.user['email'];
+    console.log(`Fetching exercises for user ${email}`);
+
+    const getExercisesQuery = `
+      SELECT exercisename, exerciseinstructions FROM ExerciseRoutine WHERE email = $1;
+    `;
+    const exerciseResult = await client.query(getExercisesQuery, [email]);
+
+    const allData = [];
+
+    for (const row of exerciseResult.rows) {
+      const entry = {
+        exercisename: row.exercisename,
+        exerciseinstructions: row.exerciseinstructions,
+        history: []
+      };
+
+      const getHistoryQuery = 'SELECT date, progress, difficulty FROM ExerciseHistory WHERE email = $1 AND exercisename = $2';
+      const historyResult = await client.query(getHistoryQuery, [email, row.exercisename]);
+
+      entry.history = historyResult.rows;
+      allData.push(entry);
+    }
+
+    res.status(200).json({"data":allData});
+
+  } catch (error) {
+    console.error('Error fetching exercises:', error);
+    res.status(500).json({ error: 'Internal Server Error' });
+  }
+});
+
+app.post('/update_exercise_history', requireLogin(AccountTypes.MEMBER), async (req, res) => {
+  try {
+    const {exercisename, date, progress, difficulty } = req.body;
+    const email = req.session.user['email'];
+    console.log(`Updating exercise history for user ${email}, exercise ${exercisename}, date ${date}`);
+
+    
+    if (!exercisename || !date || !progress || !difficulty) {
+      return res.status(400).json({ error: 'exercisename, day, progress, difficulty required.' });
+    }
+
+    const updateHistoryQuery = `
+      INSERT INTO ExerciseHistory (email, exercisename, date, progress, difficulty)
+      VALUES ($1, $2, $3, $4, $5)
+      ON CONFLICT (email, exercisename, date) DO UPDATE
+      SET progress = $4, difficulty = $5;
+    `;
+
+    const values = [email, exercisename, date, progress, difficulty];
+
+    await client.query(updateHistoryQuery, values);
+
+    res.status(200).json({ success: true });
+
+  } catch (error) {
+    console.error('Error updating exercise history:', error);
+    res.status(500).json({ error: 'Internal Server Error' });
+  }
+});
+
+// Endpoint to add a new exercise routine
+app.post('/add_exercise_routine', requireLogin(AccountTypes.MEMBER), async (req, res) => {
+  try {
+      const { exercisename, exerciseinstructions } = req.body;
+      const email = req.session.user['email'];
+
+      // Check if required values are present
+      if (!exercisename || !exerciseinstructions) {
+          return res.status(400).json({ error: 'Exercise name, exercise instructions, and email are required.' });
+      }
+
+      console.log(`Adding new exercise routine for user ${email}, exercise ${exercisename}`);
+
+      // Check if the exercise routine already exists for the user
+      const checkExistenceQuery = `
+          SELECT * FROM ExerciseRoutine
+          WHERE email = $1 AND exercisename = $2;
+      `;
+      const checkExistenceValues = [email, exercisename];
+      const existingRoutine = await client.query(checkExistenceQuery, checkExistenceValues);
+
+      if (existingRoutine.rows.length > 0) {
+          return res.status(400).json({ error: 'Exercise routine already exists for this user.' });
+      }
+
+      // Insert the new exercise routine into the database
+      const insertQuery = `
+          INSERT INTO ExerciseRoutine (email, exercisename, exerciseinstructions)
+          VALUES ($1, $2, $3);
+      `;
+      const insertValues = [email, exercisename, exerciseinstructions];
+      await client.query(insertQuery, insertValues);
+
+      res.status(200).json({ success: true });
+
+  } catch (error) {
+      console.error('Error adding new exercise routine:', error);
+      res.status(500).json({ error: 'Internal Server Error' });
+  }
+});
+
+// Endpoint to delete an exercise routine
+app.post('/delete_exercise_routine', requireLogin(AccountTypes.MEMBER), async (req, res) => {
+  try {
+      const { exercisename } = req.body;
+      const email = req.session.user['email'];
 
 
+      // Check if required values are present
+      if (!exercisename || !email) {
+          return res.status(400).json({ error: 'Exercise name and email are required.' });
+      }
+      
+      console.log(`Deleting exercise routine for user ${email}, exercise ${exercisename}`);
 
+      // Delete the exercise routine from the database
+      const deleteQuery = `
+          DELETE FROM ExerciseRoutine
+          WHERE email = $1 AND exercisename = $2;
+      `;
 
+      const deleteValues = [email, exercisename];
+      await client.query(deleteQuery, deleteValues);
 
+      res.status(200).json({ success: true });
+
+  } catch (error) {
+      console.error('Error deleting exercise routine:', error);
+      res.status(500).json({ error: 'Internal Server Error' });
+  }
+});
 
 
 //trainer functions---------------------------------------------TRAINER FUNCTIONS----------------------------------------------------

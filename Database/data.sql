@@ -30,6 +30,27 @@ CREATE TABLE IF NOT EXISTS ExerciseGoals (
     FOREIGN KEY (email) REFERENCES Members(email)
 );
 
+DROP TABLE IF EXISTS ExerciseRoutine;
+CREATE TABLE IF NOT EXISTS ExerciseRoutine (
+    email VARCHAR(30) NOT NULL,
+    exercisename TEXT NOT NULL,
+    exerciseinstructions TEXT NOT NULL,
+    PRIMARY KEY (email, exercisename),
+    FOREIGN KEY (email) REFERENCES Members(email) ON DELETE CASCADE
+);
+
+DROP TABLE IF EXISTS ExerciseHistory;
+CREATE TABLE IF NOT EXISTS ExerciseHistory (
+    email VARCHAR(30) NOT NULL,
+    date DATE NOT NULL,
+    exercisename TEXT NOT NULL,
+    progress BOOLEAN NOT NULL,
+    difficulty INTEGER NOT NULL CHECK (difficulty >= 0 AND difficulty <= 10),
+    PRIMARY KEY (email, date, exercisename),
+    FOREIGN KEY (email) REFERENCES Members(email) ON DELETE CASCADE,
+    FOREIGN KEY (email, exercisename) REFERENCES ExerciseRoutine(email, exercisename) ON DELETE CASCADE
+);
+
 DROP TABLE IF EXISTS Trainers;
 CREATE TABLE IF NOT EXISTS Trainers (
     email VARCHAR(30) PRIMARY KEY NOT NULL,

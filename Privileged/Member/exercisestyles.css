@@ -50,7 +50,7 @@ body {
   }
   
   table, th, td {
-    border: 1px solid #414141;
+    border: 1px solid #afafaf;
     padding: 8px;
   }
   
@@ -145,7 +145,7 @@ th {
 }
 /* Style for even rows */
 .row1 {
-  background-color: #e5e5e5; /* Light gray background color */
+  background-color: #dff1ff; /* Light gray background color */
 }
 
 /* Style for odd rows */
