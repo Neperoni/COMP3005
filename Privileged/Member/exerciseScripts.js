@@ -70,7 +70,7 @@ function displayExercises() {
     exerciseTableBody.innerHTML = "";
 
     // Clear existing headers
-    exerciseTableHeader.innerHTML = '<th>Exercise Name</th><th colspan="2"></th>';
+    exerciseTableHeader.innerHTML = '<th>Exercises</th><th colspan="2"></th>';
 
     // Generate table headers for the last 7 days from today
     const today = new Date();
@@ -88,14 +88,18 @@ function displayExercises() {
     exerciseHistoryData.forEach(exercise => {
         const topRow = document.createElement("tr");
         const bottomRow = document.createElement("tr");
+        const deleteRow = document.createElement("tr");
+
+
+        deleteRow.innerHTML = `<button onclick="deleteExercise('${exercise.exercisename}')">Delete</button>`
 
         // Exercise name in the top row spanning one column
-        topRow.innerHTML = `<td colspan="2">${exercise.exercisename}</td>`;
-        bottomRow.innerHTML = `<td colspan="2">${exercise.exerciseinstructions}</td>`;
+        topRow.innerHTML = `<td colspan="2"><strong>${exercise.exercisename}</strong></td>`;
+        bottomRow.innerHTML = `<td colspan="2" style="font-size: smaller;">${exercise.exerciseinstructions}</td>`;
         exerciseTableBody.appendChild(topRow);
 
         // Add "PROGRESS" and "DIFFICULTY" entries in the "PROGRESS DIFFICULTY" column
-        topRow.innerHTML += '<td>PROGRESS</td>';
+        topRow.innerHTML += '<td>COMPLETED</td>';
         bottomRow.innerHTML += '<td>DIFFICULTY</td>';
 
         // Populate progress and difficulty in respective cells for each day
@@ -120,6 +124,7 @@ function displayExercises() {
         // Append the rows to the table body
         exerciseTableBody.appendChild(topRow);
         exerciseTableBody.appendChild(bottomRow);
+        exerciseTableBody.appendChild(deleteRow);
         rowIndex++;
 
     });
@@ -172,6 +177,34 @@ async function addNewExercise() {
     }
 }
 
+// Client-side function to delete an exercise routine
+async function deleteExercise(exerciseName) {
+    try {
+        // Send a POST request to the server to delete the exercise routine
+        const response = await fetch('/delete_exercise_routine', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({ exercisename: exerciseName })
+        });
+
+        // Check if the request was successful
+        if (!response.ok) {
+            const errorMessage = await response.text();
+            throw new Error(errorMessage);
+        }
+
+        fetchExerciseData(); // Refresh exercise data after deletion
+
+        // Display success message
+        alert("Exercise routine deleted successfully!");
+    } catch (error) {
+        console.error('Error deleting exercise routine:', error);
+        // Display error message
+        alert("Failed to delete exercise routine. Please try again later.");
+    }
+}
 
 // Function to generate options for difficulty dropdown
 function generateDifficultyOptions(selectedValue) {
@@ -190,9 +223,6 @@ function generateDifficultyOptions(selectedValue) {
 
 document.addEventListener("DOMContentLoaded", function () {
     const exerciseTableBody = document.querySelector("#exerciseTable tbody");
-
-
-
 
     // Fetch exercise data from the server and display it
     fetchExerciseData();

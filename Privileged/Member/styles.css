@@ -58,7 +58,10 @@ body {
     background-color: #085280; /* Nice shade of blue */
     color: rgb(55, 55, 55);
   }
-
+  
+  tr:nth-child(even) {
+    background-color: #ffffff;
+  }
 
   .sub-heading {
     font-size: 14px; /* Adjust the font size as needed */
