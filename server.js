@@ -462,6 +462,104 @@ app.post('/delete_exercise_routine', requireLogin(AccountTypes.MEMBER), async (r
 });
 
 
+//------------------------member schedule
+// Endpoint to leave a session
+app.post('/leave_session', requireLogin(AccountTypes.MEMBER), async (req, res) => {
+  try {
+      const email = req.session.user['email'];
+      const { bookingID } = req.body;
+      if (!email || !bookingID) {
+          return res.status(400).json({ error: 'Invalid email or bookingID.' });
+      }
+
+      // Delete the user's entry from the Participants table only if they are enrolled in the session
+      const leaveSessionQuery = `
+          DELETE FROM Participants
+          WHERE bookingID = $1 AND memberemail = $2;
+      `;
+      const result = await client.query(leaveSessionQuery, [bookingID, email]);
+      if (result.rowCount === 0) {
+          return res.status(400).json({ error: 'User is not enrolled in this session.' });
+      }
+
+      res.status(200).json({ success: true });
+  } catch (error) {
+      console.error('Error leaving session:', error);
+      res.status(500).json({ error: 'Internal Server Error' });
+  }
+});
+
+// Endpoint to join a session
+app.post('/join_session', requireLogin(AccountTypes.MEMBER), async (req, res) => {
+  try {
+      const email = req.session.user['email'];
+      const { bookingID } = req.body;
+      if (!email || !bookingID) {
+          throw new Error('Invalid email or bookingID.');
+      }
+
+      // Attempt to insert the user's entry into the Participants table
+      const joinSessionQuery = `
+          INSERT INTO Participants (bookingID, memberemail)
+          VALUES ($1, $2);
+      `;
+      await client.query(joinSessionQuery, [bookingID, email]);
+      res.status(200).json({ success: true });
+  } catch (error) {
+      // Check if the error indicates that the session is already booked
+      if (error.code === '23505' && error.constraint === 'participants_pkey') {
+          console.error('Session already booked by the user:', error);
+          res.status(400).json({ error: 'Session already booked by the user' });
+      } else {
+          console.error('Error joining session:', error);
+          res.status(500).json({ error: 'Internal Server Error' });
+      }
+  }
+});
+
+// Endpoint to fetch user's bookings
+app.get('/fetch_user_bookings', requireLogin(AccountTypes.MEMBER), async (req, res) => {
+  try {
+      const email = req.session.user['email'];
+      if (!email) {
+          return res.status(400).json({ error: 'Invalid user email.' });
+      }
+
+      //return all bookings the user is a participant in
+      const userBookingsQuery = `
+      SELECT b.bookingID, b.name, b.description, b.day, b.start_time, b.end_time, b.room, t.name AS trainername, b.public
+      FROM Booking b
+      JOIN Participants p ON b.bookingID = p.bookingID
+      JOIN Trainers t ON b.traineremail = t.email
+      WHERE p.memberemail = $1;      
+      `;
+      const userBookings = await client.query(userBookingsQuery, [email]);
+
+      //select all bookings that are public, are not enrolled by the user, and are not fully booked
+      const availablePublicSessionsQuery = `
+      SELECT b.bookingID, b.name, b.description, b.day, b.start_time, b.end_time, b.room, b.seats, t.name AS trainername, COUNT(p.memberemail) AS seats_filled
+      FROM BOOKING b
+      JOIN TRAINERS t ON b.traineremail = t.email
+      LEFT JOIN PARTICIPANTS p ON b.bookingID = p.bookingID
+      WHERE b.public = TRUE
+      AND b.bookingID NOT IN (
+          SELECT bookingID
+          FROM PARTICIPANTS
+          WHERE memberemail = $1
+      )
+      GROUP BY b.bookingID, b.name, b.description, b.day, b.start_time, b.end_time, b.room, b.seats, t.name
+      HAVING COUNT(p.memberemail) < b.seats;
+      `;
+
+      const availableSessions = await client.query(availablePublicSessionsQuery, [email])
+
+      res.status(200).json({ bookings: userBookings.rows , available: availableSessions.rows});
+  } catch (error) {
+      console.error('Error fetching user bookings:', error);
+      res.status(500).json({ error: 'Internal Server Error' });
+  }
+});
+
 //trainer functions---------------------------------------------TRAINER FUNCTIONS----------------------------------------------------
 app.post('/searchMembers', requireLogin(AccountTypes.TRAINER), async (req, res) => {
   const { firstName, lastName } = req.body;

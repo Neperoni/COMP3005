@@ -18,3 +18,9 @@ INSERT INTO Trainers (email, name, phone) VALUES ('trainer1@example.com', 'Alice
 
 INSERT INTO ExerciseRoutine (email, exercisename, exerciseinstructions) 
 VALUES ('member1@example.com', 'PUSHUPS', 'REPS: 30, SETS: 30');
+
+-- Insert data into Booking table
+INSERT INTO Booking (day, start_time, end_time, room, traineremail, seats, public, name, description) VALUES
+('2024-04-15', '09:00:00', '10:00:00', 1, 'trainer1@example.com', 10, true, 'Morning Yoga', 'Relaxing yoga session to start your day'),
+('2024-04-15', '12:00:00', '13:00:00', 2, 'trainer2@example.com', 15, true, 'Cardio Kickboxing', 'High-intensity cardio workout with kickboxing techniques'),
+('2024-04-16', '10:00:00', '11:00:00', 3, 'trainer3@example.com', 12, true, 'Strength Training', 'Build muscle and improve strength with weightlifting exercises');

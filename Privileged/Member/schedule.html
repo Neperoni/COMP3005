@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Public Fitness Classes & Schedule Personal Training Session</title>
+    <link rel="stylesheet" href="schedulestyles.css">
+    <link rel="stylesheet" href="styles.css">
+
+</head>
+<body>
+    <h1>Public Fitness Classes</h1>
+    <table>
+        <thead>
+            <tr>
+                <th>Day</th>
+                <th>Start Time</th>
+                <th>End Time</th>
+                <th>Name</th>
+                <th>Description</th>
+                <th>Seats Available</th>
+                <th>Room</th>
+                <th>Trainer Name</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody id="publicFitnessClassTableBody">
+            <!-- Classes will be dynamically inserted here -->
+        </tbody>
+    </table>
+
+    <h1>Schedule Personal Training Session</h1>
+    <form id="scheduleForm">
+        <label for="sessionDate">Select Date:</label>
+        <input type="date" id="sessionDate" name="sessionDate">
+        <button type="submit">View Available Trainers and Time Slots</button>
+    </form>
+
+    <div id="availableTrainers"></div>
+
+    <h1>My Schedule</h1>
+    <table id="myScheduleTable">
+        <thead>
+            <tr>
+                <th>Type</th>
+                <th>Date</th>
+                <th>Start Time</th>
+                <th>End Time</th>
+                <th>Name</th>
+                <th>Description</th>
+                <th>Room</th>
+                <th>Trainer Name</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody id="myScheduleTableBody">
+            <!-- User's schedule will be dynamically inserted here -->
+        </tbody>
+    </table>
+
+    <script src="scheduleScripts.js"></script>
+</body>
+</html>

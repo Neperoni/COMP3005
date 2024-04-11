@@ -4,14 +4,14 @@
 --we then find out what kind of account they have
 --and direct it to the table and use email as the primary key
 
-DROP TABLE IF EXISTS Users;
+DROP TABLE IF EXISTS Users CASCADE;
 CREATE TABLE IF NOT EXISTS Users (
     email VARCHAR(30) PRIMARY KEY NOT NULL,
     password VARCHAR(255) NOT NULL,
     accountType NUMERIC(1,0) NOT NULL
 );
 
-DROP TABLE IF EXISTS Members;
+DROP TABLE IF EXISTS Members CASCADE;
 CREATE TABLE IF NOT EXISTS Members (
     email VARCHAR(30) PRIMARY KEY NOT NULL,
     firstName VARCHAR(15) NOT NULL,
@@ -21,25 +21,27 @@ CREATE TABLE IF NOT EXISTS Members (
     bloodpressure REAL
 );
 
-DROP TABLE IF EXISTS ExerciseGoals;
+DROP TABLE IF EXISTS ExerciseGoals CASCADE;
 CREATE TABLE IF NOT EXISTS ExerciseGoals (
     email VARCHAR(30) NOT NULL,
     exercise TEXT NOT NULL,
     goal TEXT NOT NULL,
     PRIMARY KEY (email, exercise, goal),
-    FOREIGN KEY (email) REFERENCES Members(email)
+    FOREIGN KEY (email) REFERENCES Members(email) ON DELETE CASCADE,
+    FOREIGN KEY (email) REFERENCES Users(email) ON DELETE CASCADE
 );
 
-DROP TABLE IF EXISTS ExerciseRoutine;
+DROP TABLE IF EXISTS ExerciseRoutine CASCADE;
 CREATE TABLE IF NOT EXISTS ExerciseRoutine (
     email VARCHAR(30) NOT NULL,
     exercisename TEXT NOT NULL,
     exerciseinstructions TEXT NOT NULL,
     PRIMARY KEY (email, exercisename),
-    FOREIGN KEY (email) REFERENCES Members(email) ON DELETE CASCADE
+    FOREIGN KEY (email) REFERENCES Members(email) ON DELETE CASCADE,
+    FOREIGN KEY (email) REFERENCES Users(email) ON DELETE CASCADE
 );
 
-DROP TABLE IF EXISTS ExerciseHistory;
+DROP TABLE IF EXISTS ExerciseHistory CASCADE;
 CREATE TABLE IF NOT EXISTS ExerciseHistory (
     email VARCHAR(30) NOT NULL,
     date DATE NOT NULL,
@@ -48,24 +50,16 @@ CREATE TABLE IF NOT EXISTS ExerciseHistory (
     difficulty INTEGER NOT NULL CHECK (difficulty >= 0 AND difficulty <= 10),
     PRIMARY KEY (email, date, exercisename),
     FOREIGN KEY (email) REFERENCES Members(email) ON DELETE CASCADE,
-    FOREIGN KEY (email, exercisename) REFERENCES ExerciseRoutine(email, exercisename) ON DELETE CASCADE
+    FOREIGN KEY (email, exercisename) REFERENCES ExerciseRoutine(email, exercisename) ON DELETE CASCADE,
+    FOREIGN KEY (email) REFERENCES Users(email) ON DELETE CASCADE
 );
 
-DROP TABLE IF EXISTS Trainers;
+DROP TABLE IF EXISTS Trainers CASCADE;
 CREATE TABLE IF NOT EXISTS Trainers (
     email VARCHAR(30) PRIMARY KEY NOT NULL,
 	name VARCHAR(15) NOT NULL,
-    phone VARCHAR(15)
-);
-
-DROP TABLE IF EXISTS Schedule;
-CREATE TABLE IF NOT EXISTS Schedule (
-    ScheduleID SERIAL PRIMARY KEY,
-    UserID INT,
-    StartTime TIMESTAMP,
-    EndTime TIMESTAMP,
-    RoomID INT,
-	email INT
+    phone VARCHAR(15),
+    FOREIGN KEY (email) REFERENCES Users(email) ON DELETE CASCADE
 );
 
 DROP TABLE IF EXISTS TrainerAvailabilitys;
@@ -75,66 +69,64 @@ CREATE TABLE IF NOT EXISTS TrainerAvailabilitys
     day varchar(1),
     start_time time,
     end_time time,
-    primary key (email, day, start_time),
-    foreign key (email) references Trainers(email),
+    PRIMARY KEY (email, day, start_time),
+    FOREIGN KEY (email) REFERENCES Trainers(email),
+    FOREIGN KEY (email) REFERENCES Users(email) ON DELETE CASCADE,
     check (start_time < end_time)
 );
 
-CREATE OR REPLACE FUNCTION add_schedule_entry(
-    p_UserID INT,
-    p_RoomID INT,
-    p_StartTime TIMESTAMP,
-    p_EndTime TIMESTAMP,
-    p_TrainerID INT
-) RETURNS VOID AS $$
+CREATE OR REPLACE FUNCTION check_overlap(
+    p_day DATE,
+    p_start_time TIME,
+    p_end_time TIME,
+    p_room INTEGER
+)
+RETURNS BOOLEAN AS $$
+DECLARE
+    overlap_found BOOLEAN;
 BEGIN
-    -- Check for any schedule conflict for the room
-    IF EXISTS (
+    overlap_found := EXISTS (
         SELECT 1
-        FROM Schedules
-        WHERE RoomID = p_RoomID
-        AND (
-            (StartTime < p_EndTime AND EndTime > p_StartTime) -- Checks if there is any overlap
-        )
-    ) THEN 
-        RAISE EXCEPTION 'Schedule conflict for room detected.';
-    END IF;
-    
-    -- Check for any schedule conflict for the user
-    IF EXISTS (
-        SELECT 1
-        FROM Schedules
-        WHERE UserID = p_UserID
-        AND (
-            (StartTime < p_EndTime AND EndTime > p_StartTime) -- Checks if there is any overlap
-        )
-    ) THEN
-        RAISE EXCEPTION 'Schedule conflict for user detected.';
-    END IF;
+        FROM Booking
+        WHERE day = p_day
+        AND room = p_room
+        AND (start_time, end_time) OVERLAPS (p_start_time, p_end_time)
+    );
 
-    -- If no conflicts, insert the new schedule
-    INSERT INTO Schedules (UserID, StartTime, EndTime, RoomID, TrainerID)
-    VALUES (p_UserID, p_StartTime, p_EndTime, p_RoomID, p_TrainerID);
-    
-    RAISE NOTICE 'Schedule successfully added.';
+    RETURN overlap_found;
 END;
 $$ LANGUAGE plpgsql;
 
---admins dont have user data except for login credentials
---which is handled by Users
+DROP TABLE IF EXISTS Booking CASCADE;
+CREATE TABLE IF NOT EXISTS Booking (
+    bookingID SERIAL, 
+    day DATE NOT NULL,
+    start_time TIME NOT NULL,
+    end_time TIME NOT NULL,
+    room INTEGER NOT NULL,
+    traineremail VARCHAR(30) NOT NULL,
+    seats INTEGER NOT NULL,
+    public BOOLEAN NOT NULL,
+    name TEXT NOT NULL,
+    description TEXT NOT NULL,
+    PRIMARY KEY (bookingID),
+    CHECK (NOT check_overlap(day, start_time, end_time, room)),
+    FOREIGN KEY (traineremail) REFERENCES Users(email) ON DELETE CASCADE,
+    FOREIGN KEY (traineremail) REFERENCES Trainers(email) ON DELETE CASCADE
+);
 
+
+DROP TABLE IF EXISTS Participants;
+CREATE TABLE Participants (
+    bookingID INTEGER,
+    memberemail VARCHAR(30) NOT NULL,
+    PRIMARY KEY (bookingID, memberemail),
+    FOREIGN KEY (bookingID) REFERENCES Booking(bookingID) ON DELETE CASCADE,
+    FOREIGN KEY (memberemail) REFERENCES Members(email) ON DELETE CASCADE,
+    FOREIGN KEY (memberemail) REFERENCES Users(email) ON DELETE CASCADE
+);
 
 /*
-
---map many to many members to events
-create table Participants
-(
-    eventID integer,
-    memberEmail VARCHAR(30) NOT NULL,
-    primary key (eventID, memberEmail),
-    foreign key (eventID) references Event(eventID),
-    foreign key (memberEmail) references Member(memberEmail)
-);
 
 create table Equipments
 (
@@ -158,23 +150,3 @@ create table Equipments
 
 
 
-create table Schedule
-(
-    eventID     serial,
-    day         varchar(1),
-    start_time  time,
-    end_time    time,
-    description text,
-    is_public   boolean,
-    room        integer,
-    primary key (eventID),
-    
-    check (not exists (
-        select 1
-        from Schedule s
-        where s.day = Schedule.day
-        and s.room = Schedule.room
-        and (s.start_time, s.end_time) OVERLAPS (Schedule.start_time, Schedule.end_time)
-        and s.eventID <> Schedule.eventID
-    ))
-);

@@ -53,15 +53,6 @@ body {
     border: 1px solid #414141;
     padding: 8px;
   }
-  
-  th {
-    background-color: #085280; /* Nice shade of blue */
-    color: rgb(55, 55, 55);
-  }
-  
-  tr:nth-child(even) {
-    background-color: #ffffff;
-  }
 
   .sub-heading {
     font-size: 14px; /* Adjust the font size as needed */
@@ -131,21 +122,6 @@ input[type="text"] {
     /* Input takes up remaining space */
 }
 
-table {
-    width: 100%;
-    border-collapse: collapse;
-    margin-top: 20px;
-}
-
-th,
-td {
-    padding: 8px;
-    border-bottom: 1px solid #ddd;
-}
-
-th {
-    background-color: #ffffff;
-}
 /* Style for even rows */
 .row1 {
   background-color: #e5e5e5; /* Light gray background color */
