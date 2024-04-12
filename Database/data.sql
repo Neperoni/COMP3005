@@ -65,7 +65,7 @@ CREATE TABLE IF NOT EXISTS Trainers (
 CREATE OR REPLACE FUNCTION check_available_overlap(
     p_day DATE,
     p_start_time TIME,
-    p_end_time TIME,
+    p_end_time TIME
 )
 RETURNS BOOLEAN AS $$
 DECLARE
@@ -86,20 +86,14 @@ DROP TABLE IF EXISTS TrainerAvailabilitys;
 CREATE TABLE IF NOT EXISTS TrainerAvailabilitys
 (
     email VARCHAR(30) NOT NULL, 
-    day varchar(1),
-    start_time time,
-    end_time time,
+    day VARCHAR(1),
+    start_time TIME,
+    end_time TIME,
     PRIMARY KEY (email, day, start_time),
     FOREIGN KEY (email) REFERENCES Trainers(email),
     FOREIGN KEY (email) REFERENCES Users(email) ON DELETE CASCADE,
-    check (start_time < end_time) and not check_available_overlap(day, start_time, end_time)
+    CHECK (start_time < end_time) and not check_available_overlap(day, start_time, end_time)
 );
-
-
-
-
-
-
 
 CREATE OR REPLACE FUNCTION check_overlap(
     p_day DATE,
