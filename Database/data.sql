@@ -63,7 +63,7 @@ CREATE TABLE IF NOT EXISTS Trainers (
 );
 
 CREATE OR REPLACE FUNCTION check_available_overlap(
-    p_day DATE,
+    p_day varchar(1),
     p_start_time TIME,
     p_end_time TIME
 )
@@ -92,7 +92,7 @@ CREATE TABLE IF NOT EXISTS TrainerAvailabilitys
     PRIMARY KEY (email, day, start_time),
     FOREIGN KEY (email) REFERENCES Trainers(email),
     FOREIGN KEY (email) REFERENCES Users(email) ON DELETE CASCADE,
-    CHECK (start_time < end_time) and not check_available_overlap(day, start_time, end_time)
+    CHECK (NOT check_available_overlap(day, start_time, end_time))
 );
 
 CREATE OR REPLACE FUNCTION check_overlap(
