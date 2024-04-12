@@ -128,16 +128,17 @@ CREATE TABLE Participants (
 
 DROP TABLE IF EXISTS Bills;
 CREATE TABLE Bills (
-    billID SERIAL PRIMARY KEY
+    billID SERIAL PRIMARY KEY,
     memberemail VARCHAR(30),
     amount FLOAT,
+    reason TEXT,
     paid BOOLEAN,
     FOREIGN KEY (memberemail) REFERENCES Members(email) ON DELETE CASCADE,
     FOREIGN KEY (memberemail) REFERENCES Users(email) ON DELETE CASCADE
-)
-/*
+);
 
-create table Equipments
+DROP TABLE IF EXISTS Equipments;
+CREATE TABLE Equipments
 (
     equipmentID serial,
     equipName varchar(30) unique,
@@ -151,7 +152,7 @@ create table Equipments
     primary key (equipmentID)
 );
 
-/*
+
 --trainers have several availability windows
 --so we need a one to many relationship
 --if there are two windows on the same day then trainerID and day is not unique enough

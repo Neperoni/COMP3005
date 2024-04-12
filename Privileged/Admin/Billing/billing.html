@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>Bills</title>
+    </head>
+    <body>
+        <h1>Search Bills by User</h1>
+        <form id="searchForm">
+            <label for="userEmail">Email:</label>
+            <input type="text" id="userEmail" name="userEmail">
+            <button type="submit">Search</button>
+        </form>
+
+        <div id="billList">
+            <!--Display Bill search results here-->
+        </div>
+
+        <h1>Create new bill</h1>
+        <form id="newBillForm">
+            <label for="emailBox">User Email:</label>
+            <input type="text" id="emailBox" name="emailBox">
+            <br>
+            <label for="priceBox">Amount:</label>
+            <input type="text" id="priceBox" name="priceBox">
+            <br>
+            <label for="reasonBox">Reason:</label>
+            <input type="text" id="reasonBox" name="reasonBox">
+            <br>
+            <button type="submit">Submit</button>
+        </form>
+
+        <h1>Mark Bill as Paid</h1>
+        <form id="markAsPaid">
+            <label for="billID">Enter Bill ID</label>
+            <input type="text" id="billID" name="billID">
+            <button type="submit">Submit</button>
+        </form>
+        <script src="billing.js"></script>
+    </body>
+</html>

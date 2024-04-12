@@ -862,3 +862,51 @@ app.get('/fetch_equipment_for_service', async (req, res) => {
     res.status(500).json({ error: 'Internal Server Error' });
   }
 });
+//----------------------------BILLING
+// Creates a new Bill
+app.post('/create_bill', async (req,res) => {
+  try{
+    const {email, price, reason} = req.body
+
+
+    const query = "INSERT INTO Bills (memberemail, amount, reason, paid) VALUES ($1,$2,$3,false)"
+
+    const values = [email, parseFloat(price), reason]
+    console.log(price)
+    await client.query(query,values)
+    res.status(200)
+  } catch (error) {
+    console.error("Error creating new bill", error);
+    res.status(500).json({error: 'Internal Server Error'})
+  }
+});
+
+app.post('/search_bills', requireLogin(AccountTypes.ADMIN), async (req,res) => {
+  try{
+    const userEmail = req.body
+    const query = `SELECT * FROM Bills WHERE memberemail = $1;`
+
+    const values = [userEmail]
+    const bills = await client.query(query, [userEmail.email])
+    console.log(values)
+    res.status(200).json({ bills: bills.rows });
+  } catch (error) {
+    console.error('Error searching for bills:', error);
+    res.status(500).json({ error: 'Internal Server Error' });
+  }
+})
+
+app.post('/pay_bill', requireLogin(AccountTypes.ADMIN), async (req,res) => {
+  try{
+    const {billID} = req.body
+
+    const query = "UPDATE Bills SET paid = true WHERE billid = $1"
+    const values = [billID]
+
+    await client.query(query,values)
+    res.status(200)
+  } catch (error) {
+    console.error("Error paying bill", error);
+    res.status(500).json({error: 'Internal Server Error'})
+  }
+})

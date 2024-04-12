@@ -2,18 +2,24 @@ INSERT INTO Users (email, password, accountType) VALUES ('user1@example.com', 'p
 INSERT INTO Users (email, password, accountType) VALUES ('member1@example.com', 'securepass', 0);
 INSERT INTO Users (email, password, accountType) VALUES ('member2@example.com', 'safepass', 0);
 INSERT INTO Users (email, password, accountType) VALUES ('trainer1@example.com', 'workout123', 1);
+INSERT INTO Users (email, password, accountType) VALUES ('trainer2@example.com', 'exercise256', 1);
+INSERT INTO Users (email, password, accountType) VALUES ('trainer3@example.com', 'trainer117', 1);
 INSERT INTO Users (email, password, accountType) VALUES ('admin@example.com', 'admin456', 2);
 
-INSERT INTO Members (email, firstName, lastName, card, fitnessGoals, restingbpm, bloodpressure) VALUES
-('member1@example.com', 'John', 'Doe', 1234567890123456, 'Lose weight, Gain muscle', 60, 120);
-INSERT INTO Members (email, firstName, lastName, card, fitnessGoals, restingbpm, bloodpressure) VALUES
-('member2@example.com', 'Jane', 'Doe', 1234567890123457, 'Live Actively', 70, 140);
-INSERT INTO Members (email, firstName, lastName, card, fitnessGoals, restingbpm, bloodpressure) VALUES
-('user1@example.com', 'Jim', 'Doe', 1234567890123466, 'Get Shredded', 40, 110);
-INSERT INTO Members (email, firstName, lastName, card, fitnessGoals, restingbpm, bloodpressure) VALUES
-('default@example.com', 'Jim', 'Dough', 1234567890123466, 'Get Porky', 40, 110);
+INSERT INTO Members (email, firstName, lastName, card, restingbpm, bloodpressure) VALUES
+('member1@example.com', 'John', 'Doe', 1234567890123456,  60, 120);
+INSERT INTO Members (email, firstName, lastName, card, restingbpm, bloodpressure) VALUES
+('member2@example.com', 'Jane', 'Doe', 1234567890123457, 70, 140);
+INSERT INTO Members (email, firstName, lastName, card, restingbpm, bloodpressure) VALUES
+('user1@example.com', 'Jim', 'Doe', 1234567890123466, 40, 110);
+INSERT INTO Members (email, firstName, lastName, card, restingbpm, bloodpressure) VALUES
+('default@example.com', 'Jim', 'Dough', 1234567890123466, 40, 110);
 
 INSERT INTO Trainers (email, name, phone) VALUES ('trainer1@example.com', 'Alice', '555-0101');
+INSERT INTO Trainers (email, name, phone) VALUES ('trainer2@example.com', 'Harry', '768-9112');
+INSERT INTO Trainers (email, name, phone) VALUES ('trainer3@example.com', 'Henry', '705-3567');
+
+INSERT INTO Bills (memberemail, amount, reason, paid) VALUES ('member1@example.com', 200.05, 'Training Session', false);
 
 
 INSERT INTO ExerciseRoutine (email, exercisename, exerciseinstructions) 
