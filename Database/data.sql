@@ -141,14 +141,14 @@ DROP TABLE IF EXISTS Equipments;
 CREATE TABLE Equipments
 (
     equipmentID serial,
-    equipName varchar(30) unique,
-    lastService date,
+    equipName varchar(30) NOT NUll,
+    lastService date NOT NULL,
     room INTEGER NOT NULL,
-    servicePeriod integer,
-    companyName varchar(40),
-    companyEmail varchar(40),
-    companyPhone varchar(40),
-    serviceCost real,
+    servicePeriod integer NOT NULL,
+    companyName varchar(40) NOT NULL,
+    companyEmail varchar(40) NOT NULL,
+    companyPhone varchar(40) NOT NULL,
+    serviceCost real NOT NULL,
     primary key (equipmentID)
 );
 

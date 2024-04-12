@@ -862,6 +862,125 @@ app.get('/fetch_equipment_for_service', async (req, res) => {
     res.status(500).json({ error: 'Internal Server Error' });
   }
 });
+
+// Endpoint to update maintenance for equipment
+app.post('/update_maintenance', requireLogin(AccountTypes.ADMIN), async (req, res) => {
+  try {
+    const { equipmentId, serviceDate } = req.body;
+
+    // Validate data
+    if (!equipmentId || !serviceDate) {
+      return res.status(400).json({ error: 'Please provide valid equipment ID and service date.' });
+    }
+
+    // Check if equipment with the specified ID exists
+    const checkExistenceQuery = `
+      SELECT equipmentID
+      FROM Equipments
+      WHERE equipmentID = $1;
+    `;
+    const checkExistenceValues = [equipmentId];
+    const checkExistenceResult = await client.query(checkExistenceQuery, checkExistenceValues);
+
+    if (checkExistenceResult.rows.length === 0) {
+      return res.status(404).json({ error: 'Equipment with the specified ID does not exist.' });
+    }
+
+    // Update maintenance record in the database
+    const updateQuery = `
+      UPDATE Equipments
+      SET lastService = $1
+      WHERE equipmentID = $2;
+    `;
+    const updateValues = [serviceDate, equipmentId];
+    await client.query(updateQuery, updateValues);
+
+    res.status(200).json({ success: true });
+  } catch (error) {
+    console.error('Error updating maintenance:', error);
+    res.status(500).json({ error: 'Internal Server Error' });
+  }
+});
+
+// Endpoint to delete equipment by ID
+app.post('/remove_equipment', requireLogin(AccountTypes.ADMIN), async (req, res) => {
+  try {
+    const { removeEquipmentId } = req.body;
+
+    // Validate data
+    if (!removeEquipmentId) {
+      return res.status(400).json({ error: 'Please provide a valid equipment ID.' });
+    }
+
+    // Check if equipment with the specified ID exists
+    const checkExistenceQuery = `
+      SELECT equipmentID
+      FROM Equipments
+      WHERE equipmentID = $1;
+    `;
+    const checkExistenceValues = [removeEquipmentId];
+    const checkExistenceResult = await client.query(checkExistenceQuery, checkExistenceValues);
+
+    if (checkExistenceResult.rows.length === 0) {
+      return res.status(404).json({ error: 'Equipment with the specified ID does not exist.' });
+    }
+
+    // Delete equipment from the database
+    const deleteQuery = `
+      DELETE FROM Equipments
+      WHERE equipmentID = $1;
+    `;
+    const deleteValues = [removeEquipmentId];
+    await client.query(deleteQuery, deleteValues);
+
+    res.status(200).json({ success: true });
+  } catch (error) {
+    console.error('Error removing equipment:', error);
+    res.status(500).json({ error: 'Internal Server Error' });
+  }
+});
+
+// Endpoint to add new equipment
+app.post('/add_equipment', requireLogin(AccountTypes.ADMIN), async (req, res) => {
+  try {
+    const { equipName, lastService, room, servicePeriod, companyName, companyEmail, companyPhone, serviceCost } = req.body;
+
+    // Validate data
+    if (!equipName || !lastService || !room || !servicePeriod || !companyName || !companyEmail || !companyPhone || !serviceCost) {
+      return res.status(400).json({ error: 'Please provide valid equipment details.' });
+    }
+
+    // Insert equipment record into the database
+    const insertQuery = `
+      INSERT INTO Equipments (equipName, lastService, room, servicePeriod, companyName, companyEmail, companyPhone, serviceCost)
+      VALUES ($1, $2, $3, $4, $5, $6, $7, $8);
+    `;
+    const values = [equipName, lastService, room, servicePeriod, companyName, companyEmail, companyPhone, serviceCost];
+    await client.query(insertQuery, values);
+
+    res.status(200).json({ success: true });
+  } catch (error) {
+    console.error('Error adding equipment:', error);
+    res.status(500).json({ error: 'Internal Server Error' });
+  }
+});
+// Endpoint to fetch all equipment
+app.post('/get_all_equipment', requireLogin(AccountTypes.ADMIN), async (req, res) => {
+  try {
+    // Query database to fetch all equipment
+    const query = `
+      SELECT *
+      FROM Equipments;
+    `;
+    const result = await client.query(query);
+
+    // Send the equipment data in the response
+    res.status(200).json({ equipment: result.rows });
+  } catch (error) {
+    console.error('Error fetching all equipment:', error);
+    res.status(500).json({ error: 'Internal Server Error' });
+  }
+});
 //----------------------------BILLING
 // Creates a new Bill
 app.post('/create_bill', async (req,res) => {

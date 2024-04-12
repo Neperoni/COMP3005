@@ -20,29 +20,60 @@
 
     <h1>Maintenance Schedule</h1>
     <div id="maintenanceList">
+        <!-- Maintenance schedule will be displayed here -->
+    </div>
+
+    <h1>Update Maintenance</h1>
+    <form id="updateForm">
+        <label for="equipmentid">Equipment ID:</label>
+        <input type="text" id="equipmentid" name="equipmentid">
+        <label for="servicedate">Service Date:</label>
+        <input type="date" id="servicedate" name="servicedate">
+        <button type="submit">Update</button>
+    </form>
+
+    <h1>Remove Equipment</h1>
+    <form id="removeForm">
+        <label for="removeEquipmentId">Equipment ID:</label>
+        <input type="text" id="removeEquipmentId" name="removeEquipmentId">
+        <button type="submit">Remove</button>
+    </form>    
+
+    <h1>Add Equipment</h1>
+    <form id="addForm">
+        <label for="equipName">Equipment Name:</label>
+        <input type="text" id="equipName" name="equipName" required>
+        <br>
+        <label for="lastService">Last Service:</label>
+        <input type="date" id="lastService" name="lastService" required>
+        <br>
+        <label for="room">Room:</label>
+        <input type="number" id="room" name="room" required>
+        <br>
+        <label for="servicePeriod">Service Period:</label>
+        <input type="number" id="servicePeriod" name="servicePeriod" required>
+        <br>
+        <label for="companyName">Company Name:</label>
+        <input type="text" id="companyName" name="companyName">
+        <br>
+        <label for="companyEmail">Company Email:</label>
+        <input type="email" id="companyEmail" name="companyEmail">
+        <br>
+        <label for="companyPhone">Company Phone:</label>
+        <input type="tel" id="companyPhone" name="companyPhone">
+        <br>
+        <label for="serviceCost">Service Cost:</label>
+        <input type="number" id="serviceCost" name="serviceCost">
+        <br>
+        <button type="submit">Add Equipment</button>
+    </form>
+    
+    <h1>All Equipment</h1>
+    <button id="refreshButton">Refresh</button> <!-- Refresh button -->
+    <div id="allEquipmentList">
         <!-- Equipment list will be displayed here -->
     </div>
-    <h1>Update maintenace</h1>
-    <form id="searchForm">
-        <label for="equipmentid">Equipment ID:</label>
-        <input type="text" id="equipmentid" name="equipmentid">
-        <label for="servicedate">Service date:</label>
-        <input type="date" id="servicedate" name="servicedate">
-        <button type="Update">Update</button>
-    </form>
-    <h1>Remove equipment</h1>
-    <form id="searchForm">
-        <label for="equipmentid">Equipment ID:</label>
-        <input type="text" id="equipmentid" name="equipmentid">
-        <button type="Remove">Remove</button>
-    </form>
-    <h1>Add equipment</h1>
-    <form id="searchForm">
 
-
-
-        <button type="Add">Add</button>
-    </form>
     <script src="equipment.js"></script>
 </body>
 </html>
