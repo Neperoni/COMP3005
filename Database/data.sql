@@ -62,6 +62,26 @@ CREATE TABLE IF NOT EXISTS Trainers (
     FOREIGN KEY (email) REFERENCES Users(email) ON DELETE CASCADE
 );
 
+CREATE OR REPLACE FUNCTION check_available_overlap(
+    p_day DATE,
+    p_start_time TIME,
+    p_end_time TIME,
+)
+RETURNS BOOLEAN AS $$
+DECLARE
+    overlap_found BOOLEAN;
+BEGIN
+    overlap_found := EXISTS (
+        SELECT 1
+        FROM TrainerAvailabilitys
+        WHERE day = p_day
+        AND (start_time, end_time) OVERLAPS (p_start_time, p_end_time)
+    );
+
+    RETURN overlap_found;
+END;
+$$ LANGUAGE plpgsql;
+
 DROP TABLE IF EXISTS TrainerAvailabilitys;
 CREATE TABLE IF NOT EXISTS TrainerAvailabilitys
 (
@@ -72,8 +92,14 @@ CREATE TABLE IF NOT EXISTS TrainerAvailabilitys
     PRIMARY KEY (email, day, start_time),
     FOREIGN KEY (email) REFERENCES Trainers(email),
     FOREIGN KEY (email) REFERENCES Users(email) ON DELETE CASCADE,
-    check (start_time < end_time)
+    check (start_time < end_time) and not check_available_overlap(day, start_time, end_time)
 );
+
+
+
+
+
+
 
 CREATE OR REPLACE FUNCTION check_overlap(
     p_day DATE,

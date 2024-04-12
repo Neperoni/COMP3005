@@ -793,7 +793,7 @@ app.post('/fetch_trainer_availabilities', requireLogin(AccountTypes.ADMIN), asyn
 
     // Query database to fetch trainer availabilities for the specified date
     const query = `
-    SELECT t.name, a.start_time, a.end_time
+    SELECT t.name, a.email, a.start_time, a.end_time
     FROM TrainerAvailabilitys a
     JOIN Trainers t ON a.email = t.email
     WHERE a.day = $1;    

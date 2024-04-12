@@ -1,0 +1,74 @@
+.container {
+    margin-top: 20px;
+  }
+  
+  label {
+    font-weight: bold;
+  }
+  
+  input[type="text"] {
+    width: 200px;
+    margin-right: 10px;
+  }
+  
+  button {
+    padding: 5px 10px;
+    background-color: #007bff;
+    color: white;
+    border: none;
+    cursor: pointer;
+  }
+  
+  table {
+    border-collapse: collapse;
+    width: 100%;
+  }
+  
+  th, td {
+    border: 1px solid #dddddd;
+    text-align: left;
+    padding: 8px;
+  }
+  
+  th {
+    background-color: #f2f2f2;
+  }
+  .schedule {
+    display: flex;
+    width: 100%;
+  }
+  
+  .trainers {
+    flex: 0 0 100px; /* Adjust width of trainers column */
+  }
+  
+  .trainer {
+    height: 30px;
+    background-color: #ddd;
+    border-bottom: 1px solid black;
+    text-align: center;
+    line-height: 30px;
+  }
+  
+  .availabilities {
+    flex: 1;
+    position: relative;
+  }
+  
+  .availability {
+    position: absolute;
+    background-color: #b3e6ff;
+    border: 1px solid #006bb3;
+  }
+  
+  .bookings {
+    flex: 1;
+    position: relative;
+  }
+  
+  .booking {
+    position: absolute;
+    background-color: #ffcccc;
+    border: 1px solid #ff6666;
+  }
+  
