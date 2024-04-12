@@ -126,6 +126,15 @@ CREATE TABLE Participants (
     FOREIGN KEY (memberemail) REFERENCES Users(email) ON DELETE CASCADE
 );
 
+DROP TABLE IF EXISTS Bills;
+CREATE TABLE Bills (
+    billID SERIAL PRIMARY KEY
+    memberemail VARCHAR(30),
+    amount FLOAT,
+    paid BOOLEAN,
+    FOREIGN KEY (memberemail) REFERENCES Members(email) ON DELETE CASCADE,
+    FOREIGN KEY (memberemail) REFERENCES Users(email) ON DELETE CASCADE
+)
 /*
 
 create table Equipments

@@ -779,3 +779,6 @@ app.post('/fetch_trainer_availabilities', requireLogin(AccountTypes.ADMIN), asyn
   }
 });
 
+app.post('/create_bill', requireLogin(AccountTypes.ADMIN), async (req, res) => {
+  // WIP
+})
