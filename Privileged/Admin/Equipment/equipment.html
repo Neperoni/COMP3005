@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Equipment Search</title>
+    <link rel="stylesheet" href="equipmentstyle.css"><!-- public styles-->
+</head>
+<body>
+    <h1>Search Equipment by Room</h1>
+    <form id="searchForm">
+        <label for="roomNumber">Room Number:</label>
+        <input type="text" id="roomNumber" name="roomNumber">
+        <button type="submit">Search</button>
+    </form>
+
+    <div id="equipmentList">
+        <!-- Equipment list will be displayed here -->
+    </div>
+
+    <h1>Maintenance Schedule</h1>
+    <div id="maintenanceList">
+        <!-- Equipment list will be displayed here -->
+    </div>
+    <h1>Update maintenace</h1>
+    <form id="searchForm">
+        <label for="equipmentid">Equipment ID:</label>
+        <input type="text" id="equipmentid" name="equipmentid">
+        <label for="servicedate">Service date:</label>
+        <input type="date" id="servicedate" name="servicedate">
+        <button type="Update">Update</button>
+    </form>
+    <h1>Remove equipment</h1>
+    <form id="searchForm">
+        <label for="equipmentid">Equipment ID:</label>
+        <input type="text" id="equipmentid" name="equipmentid">
+        <button type="Remove">Remove</button>
+    </form>
+    <h1>Add equipment</h1>
+    <form id="searchForm">
+
+
+
+        <button type="Add">Add</button>
+    </form>
+    <script src="equipment.js"></script>
+</body>
+</html>

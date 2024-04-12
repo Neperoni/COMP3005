@@ -736,6 +736,36 @@ function validateTimeSlot(startTime, endTime) {
 
 //--------------------------------------------------ADMIN FUNCTIONS
 
+// Endpoint to fetch bookings for a specific room
+app.post('/fetch_bookings_by_room', requireLogin(AccountTypes.ADMIN), async (req, res) => {
+  try {
+    const { roomNumber } = req.body;
+
+    // Validate data
+    if (!roomNumber || isNaN(roomNumber)) {
+      return res.status(400).json({ error: 'Please provide a valid numeric room number.' });
+    }
+
+    // Query database to fetch bookings for the specified room
+    const query = `
+    SELECT *
+    FROM Booking
+    WHERE room = $1;    
+    `;
+
+    const values = [roomNumber];
+    const bookings = await client.query(query, values);
+
+    res.status(200).json({ bookings: bookings.rows });
+  } catch (error) {
+    console.error('Error fetching bookings by room:', error);
+    res.status(500).json({ error: 'Internal Server Error' });
+  }
+});
+
+
+
+
 
 // Endpoint to fetch trainer availabilities for a specific date
 app.post('/fetch_trainer_availabilities', requireLogin(AccountTypes.ADMIN), async (req, res) => {
@@ -779,6 +809,56 @@ app.post('/fetch_trainer_availabilities', requireLogin(AccountTypes.ADMIN), asyn
   }
 });
 
-app.post('/create_bill', requireLogin(AccountTypes.ADMIN), async (req, res) => {
-  // WIP
-})
+// Endpoint to fetch equipment by room
+app.post('/fetch_equipment_by_room', requireLogin(AccountTypes.ADMIN), async (req, res) => {
+  try {
+    const { roomNumber } = req.body;
+
+    // Validate room number
+    if (!roomNumber || isNaN(roomNumber)) {
+      return res.status(400).json({ error: 'Please provide a valid room number.' });
+    }
+
+    // Query database to fetch equipment by room
+    const query = `
+    SELECT * FROM Equipments
+    WHERE room = $1;
+    `;
+
+    const values = [roomNumber];
+    const equipment = await client.query(query, values);
+
+    res.status(200).json({ equipment: equipment.rows });
+  } catch (error) {
+    console.error('Error fetching equipment by room:', error);
+    res.status(500).json({ error: 'Internal Server Error' });
+  }
+});
+
+// Endpoint to fetch equipment needing service within the next 60 days
+app.get('/fetch_equipment_for_service', async (req, res) => {
+  try {
+    // Calculate today's date
+    const today = new Date();
+    const todayString = today.toISOString().split('T')[0]; // Format: YYYY-MM-DD
+
+    // Calculate date 60 days from today
+    const futureDate = new Date(today);
+    futureDate.setDate(futureDate.getDate() + 60);
+    const futureDateString = futureDate.toISOString().split('T')[0]; // Format: YYYY-MM-DD
+
+    // Query database to fetch equipment needing service within the next 60 days
+    const query = `
+      SELECT * 
+      FROM Equipments
+      WHERE lastService + servicePeriod <= $1;
+    `;
+    const values = [futureDateString];
+    const equipments = await client.query(query, values);
+
+    res.status(200).json({ equipments: equipments.rows });
+  } catch (error) {
+    console.error('Error fetching equipment for service:', error);
+    res.status(500).json({ error: 'Internal Server Error' });
+  }
+});

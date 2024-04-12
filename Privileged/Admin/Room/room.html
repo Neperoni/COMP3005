@@ -1,0 +1,20 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Room Bookings</title>
+    <link rel="stylesheet" href="styles.css"> <!-- Link to your CSS file -->
+</head>
+<body>
+    <h1>Room Bookings</h1>
+    <div class="container">
+        <label for="roomNumber">Enter Room Number:</label>
+        <input type="text" id="roomNumber" name="roomNumber">
+        <button onclick="getBookings()">Get Bookings</button>
+        <div id="bookingTable"></div> <!-- Table will be dynamically generated here -->
+    </div>
+
+    <script src="room.js"></script> <!-- Link to your JavaScript file -->
+</body>
+</html>
