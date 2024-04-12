@@ -739,10 +739,10 @@ function validateTimeSlot(startTime, endTime) {
 // Endpoint to fetch bookings for a specific room
 app.post('/fetch_bookings_by_room', requireLogin(AccountTypes.ADMIN), async (req, res) => {
   try {
-    const { roomNumber } = req.body;
+    const { roomnumber } = req.body;
 
     // Validate data
-    if (!roomNumber || isNaN(roomNumber)) {
+    if (!roomnumber || isNaN(roomnumber)) {
       return res.status(400).json({ error: 'Please provide a valid numeric room number.' });
     }
 
@@ -753,7 +753,7 @@ app.post('/fetch_bookings_by_room', requireLogin(AccountTypes.ADMIN), async (req
     WHERE room = $1;    
     `;
 
-    const values = [roomNumber];
+    const values = [roomnumber];
     const bookings = await client.query(query, values);
 
     res.status(200).json({ bookings: bookings.rows });
@@ -765,7 +765,188 @@ app.post('/fetch_bookings_by_room', requireLogin(AccountTypes.ADMIN), async (req
 
 
 
+// Endpoint to fetch bookings for a specific room
+app.post('/fetch_bookings_by_trainer', requireLogin(AccountTypes.ADMIN), async (req, res) => {
+  try {
+    const { traineremail } = req.body;
 
+    // Validate data
+    if (!traineremail) {
+      return res.status(400).json({ error: 'Please provide a valid numeric room number.' });
+    }
+
+    // Query database to fetch bookings for the specified room
+    const query = `
+    SELECT *
+    FROM Booking
+    WHERE traineremail = $1;    
+    `;
+
+    const values = [traineremail];
+    const bookings = await client.query(query, values);
+
+    res.status(200).json({ bookings: bookings.rows });
+  } catch (error) {
+    console.error('Error fetching bookings by traineremail:', error);
+    res.status(500).json({ error: 'Internal Server Error' });
+  }
+});
+
+
+app.post('/create_booking', requireLogin(AccountTypes.ADMIN), async (req, res) => {
+  try {
+      const { date, start_time, end_time, room, traineremail, seats, public, name, description } = req.body;
+
+        // Validate data
+      if (!date || !start_time || !end_time || !room || isNaN(room) || !traineremail || !seats || isNaN(seats) || public === undefined || public === null || !name || !description) {
+          return res.status(400).json({ error: 'Please provide all required fields with valid values.' });
+      }
+
+      // Query database to insert the new booking
+      const query = `
+      INSERT INTO Booking (day, start_time, end_time, room, traineremail, seats, public, name, description)
+      VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9)
+      RETURNING *;
+      `;
+
+      const values = [date, start_time, end_time, room, traineremail, seats, public, name, description];
+      const newBooking = await client.query(query, values);
+
+      res.status(200).json({ booking: newBooking.rows[0] });
+  } catch (error) {
+      console.error('Error creating booking:', error);
+      res.status(500).json({ error: 'Internal Server Error' });
+  }
+});
+
+app.post('/add_member_to_booking', requireLogin(AccountTypes.ADMIN), async (req, res) => {
+  try {
+    const { bookingid, memberemail } = req.body;
+
+    // Validate input
+    if (!bookingid || !memberemail) {
+      return res.status(400).json({ error: 'Please provide all required fields with valid values.' });
+    }
+
+    // Query database to add member to the booking
+    const query = `
+      INSERT INTO Participants (bookingID, memberemail)
+      VALUES ($1, $2);
+    `;
+
+    const values = [bookingid, memberemail];
+    await client.query(query, values);
+
+    res.status(200).json({ success: true });
+  } catch (error) {
+    console.error('Error adding member to booking:', error);
+    res.status(500).json({ error: 'Internal Server Error' });
+  }
+});
+
+app.post('/fetch_participants_by_bookingID', requireLogin(AccountTypes.ADMIN), async (req, res) => {
+  try {
+    const { bookingID } = req.body;
+
+    // Validate input
+    if (!bookingID || isNaN(bookingID)) {
+      return res.status(400).json({ error: 'Please provide a valid Booking ID.' });
+    }
+
+    // Query database to fetch participants and their names for the specified bookingID
+    const query = `
+      SELECT p.memberemail, m.firstname, m.lastname
+      FROM Participants p
+      JOIN Members m ON p.memberemail = m.email
+      WHERE p.bookingID = $1;
+    `;
+
+    const values = [bookingID];
+    const participants = await client.query(query, values);
+
+    res.status(200).json({ participants: participants.rows });
+  } catch (error) {
+    console.error('Error fetching participants by bookingID:', error);
+    res.status(500).json({ error: 'Internal Server Error' });
+  }
+});
+
+app.post('/fetch_bookings_by_date', requireLogin(AccountTypes.ADMIN),  async (req, res) => {
+  try {
+      const {date } = req.body;
+
+      // Validate data
+      if (!date) {
+          return res.status(400).json({ error: 'Please provide valid date.' });
+      }
+
+      // Query database to fetch bookings for the specified room and date
+      const query = `
+          SELECT *
+          FROM Booking
+          WHERE day = $1;
+      `;
+
+      const values = [date];
+      const bookings = await client.query(query, values);
+
+      res.status(200).json({ bookings: bookings.rows });
+  } catch (error) {
+      console.error('Error fetching bookings by date:', error);
+      res.status(500).json({ error: 'Internal Server Error' });
+  }
+});
+
+app.post('/delete_booking_by_id', requireLogin(AccountTypes.ADMIN), async (req, res) => {
+  try {
+      const { bookingID } = req.body;
+
+      // Validate session ID
+      if (!bookingID || isNaN(bookingID)) {
+          return res.status(400).json({ error: 'Please provide a valid session ID.' });
+      }
+
+      // Query database to delete the session
+      const query = `
+          DELETE FROM Booking
+          WHERE bookingID = $1
+      `;
+      const values = [bookingID];
+      await client.query(query, values);
+
+      res.status(200).json({ message: 'Session deleted successfully.' });
+  } catch (error) {
+      console.error('Error deleting session:', error);
+      res.status(500).json({ error: 'Internal Server Error' });
+  }
+});
+app.post('/delete_participant', requireLogin(AccountTypes.ADMIN), async (req, res) => {
+  try {
+      const { memberEmail, bookingID } = req.body;
+
+      // Validate member email and booking ID
+      if (!memberEmail || !bookingID) {
+          return res.status(400).json({ error: 'Please provide valid member email and booking ID.' });
+      }
+
+      // Query database to delete the participant
+      const query = `
+          DELETE FROM Participants
+          WHERE memberemail = $1 AND bookingID = $2
+      `;
+      const values = [memberEmail, bookingID];
+      const result = await client.query(query, values);
+
+      if (result.rowCount === 0) {
+          return res.status(404).json({ error: 'Participant not found.' });
+      }
+
+      res.status(200).json({ message: 'Participant deleted successfully.' });
+  } catch (error) {
+      console.error('Error deleting participant:', error);
+      res.status(500).json({ error: 'Internal Server Error' });
+  }
+});
 
 // Endpoint to fetch trainer availabilities for a specific date
 app.post('/fetch_trainer_availabilities', requireLogin(AccountTypes.ADMIN), async (req, res) => {

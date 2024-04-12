@@ -7,13 +7,68 @@
     <link rel="stylesheet" href="styles.css"> <!-- Link to your CSS file -->
 </head>
 <body>
-    <h1>Room Bookings</h1>
-    <div class="container">
-        <label for="roomNumber">Enter Room Number:</label>
-        <input type="text" id="roomNumber" name="roomNumber">
-        <button onclick="getBookings()">Get Bookings</button>
-        <div id="bookingTable"></div> <!-- Table will be dynamically generated here -->
+
+    <div id="todayBookingsContainer">
+        <h2>Bookings for Today</h2>
+        <table id="todayBookingsTable">
+            <thead>
+                <tr>
+                    <th>Booking ID</th>
+                    <th>Day</th>
+                    <th>Start Time</th>
+                    <th>End Time</th>
+                    <th>Room</th>
+                    <th>Trainer Email</th>
+                    <th>Seats</th>
+                    <th>Public</th>
+                    <th>Name</th>
+                    <th>Description</th>
+                </tr>
+            </thead>
+            <tbody id="todayBookingsTableBody">
+                <!-- Booking rows will be dynamically inserted here -->
+            </tbody>
+        </table>
     </div>
+
+    <h2>Search for Booking</h2>
+    <div class="container">
+        <label for="roomNumber">By Room Number:</label>
+        <input type="text" id="roomNumber" name="roomNumber">
+        <button onclick="getBookingsByRoom()">Search</button>
+   
+        <label for="searchDate">By Date:</label>
+        <input type="date" id="searchDate" name="searchDate">
+        <button onclick="searchBookingsByDate()">Search</button>
+    </div>    
+    <div id="bookingTable"></div> <!-- Table will be dynamically generated here -->
+
+    <h2>Add member to existing booking</h2>
+    <form id="addMemberForm">
+        <label for="bookingID">Booking ID:</label>
+        <input type="number" id="bookingID" name="bookingID">
+        <label for="memberEmail">Member Email:</label>
+        <input type="email" id="memberEmail" name="memberEmail">
+        <button type="submit">Add Member to Booking</button>
+    </form>
+
+    <h2>Fetch Participants by Booking ID</h2>
+    <form id="fetchParticipantsForm">
+        <label for="fetchParticipantBookingID">Enter Booking ID:</label>
+        <input type="number" id="fetchParticipantBookingID" name="fetchParticipantBookingID">
+        <button type="button" onclick="fetchParticipants()">Fetch Participants</button>
+    </form>
+    
+    <div id="participantParticipantsContainer"></div>
+
+    <h2>Delete Participant</h2>
+    <form id="deleteParticipantForm">
+        <label for="deleteParticipantMemberEmail">Member Email:</label>
+        <input type="email" id="deleteParticipantMemberEmail" name="memberEmail">
+        <label for="deleteParticipantBookingID">Booking ID:</label>
+        <input type="number" id="deleteParticipantBookingID" name="bookingID">
+        <button type="button" onclick="deleteParticipant()">Delete Participant</button>
+    </form>    
 
     <script src="room.js"></script> <!-- Link to your JavaScript file -->
 </body>

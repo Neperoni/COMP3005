@@ -1,41 +1,125 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Trainer Availabilities</title>
-<link rel="stylesheet" href="styles.css">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>User Profile</title>
+    <link rel="stylesheet" href="scheduleStyle.css"> <!-- Include your stylesheet -->
+    <link rel="stylesheet" href="styles.css"> <!-- Include your stylesheet -->
 </head>
+
 <body>
-<div class="date-selector">
-  <label for="date">Select Date:</label>
-  <input type="date" id="date" name="date">
-  <button id="viewAvailabilities">View Availabilities</button>
-</div>
+    <h1>Schedule Creation </h1>
+    <div id="profileInfo">
+        <!-- Profile information will be displayed here -->
+    </div>
 
-<div class="schedule">
-  <div class="header">
-    <h2>Trainers</h2>
-  </div>
-  <div class="trainers">
-    <!-- Trainer columns will be dynamically added here -->
-  </div>
+        <!DOCTYPE html>
+    <html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>Room Bookings</title>
+        <link rel="stylesheet" href="styles.css"> <!-- Link to your CSS file -->
+    </head>
+    <body>
 
-  <div class="header">
-    <h2>Time Slots</h2>
-  </div>
-  <div class="slots">
-    <!-- Time slots will be dynamically added here -->
-  </div>
+    <form id="scheduleForm">
+        <label for="sessionDate">Select Date:</label>
+        <input type="date" id="sessionDate" name="sessionDate">
+        <button type="button" onclick="fetchTrainerAvailabilities()">View Available Trainers and Time Slots</button>
+    </form>
 
-  <div class="header">
-    <h2>Bookings</h2>
-  </div>
-  <div class="bookings">
-    <!-- Booking slots will be dynamically added here -->
-  </div>
-</div>
+    <div id="availabilityContainer">
+        <h3>Trainer Availability on Selected Date</h3>
+        <table id="availabilityTable">
+            <thead>
+                <tr>
+                    <th>Trainer Name</th>
+                    <th>Trainer Email</th>
+                    <th>Start Time</th>
+                    <th>End Time</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody id="availabilityTableBody">
+                <!-- Trainer availability rows will be dynamically inserted here -->
+            </tbody>
+        </table>
+    </div>
+    <h3>Room Bookings on Selected Date</h3>
 
-<script src="scheduleScripts.js"></script>
+    <table id="roomTable">
+        <thead>
+            <tr>
+                <th>Room number</th>
+                <th>Start Time</th>
+                <th>End Time</th>
+            </tr>
+        </thead>
+        <tbody id="roomTableBody">
+            
+        </tbody>
+    </table>
+    <div id="bookingsContainer">
+        <h3 id="trainerHeader">Bookings for Selected Trainer</h3>
+        <table id="bookingsTable">
+            <thead>
+                <tr>
+                    <th>Start Time</th>
+                    <th>End Time</th>
+                </tr>
+            </thead>
+            <tbody id="bookingsTableBody">
+                <!-- Trainer bookings rows will be dynamically inserted here -->
+            </tbody>
+        </table>
+    </div>
+
+    <h2>Add new booking</h2>
+    <form id="createBookingForm">
+        <label for="day">Day:</label>
+        <input type="date" id="day" name="day">
+        
+        <label for="start_time">Start Time:</label>
+        <input type="time" id="start_time" name="start_time">
+        
+        <label for="end_time">End Time:</label>
+        <input type="time" id="end_time" name="end_time">
+        
+        <label for="room">Room:</label>
+        <input type="number" id="room" name="room">
+        
+        <label for="traineremail">Trainer Email:</label>
+        <input type="email" id="traineremail" name="traineremail">
+        
+        <label for="seats">Seats:</label>
+        <input type="number" id="seats" name="seats">
+        
+        <label for="public">Public:</label>
+        <select id="public" name="public">
+            <option value="true">Yes</option>
+            <option value="false">No</option>
+        </select>
+        
+        <label for="name">Name:</label>
+        <input type="text" id="name" name="name">
+        
+        <label for="description">Description:</label>
+        <textarea id="description" name="description"></textarea>
+        
+        <button type="submit">Create Booking</button>
+    </form>
+    
+    <h2>Delete Booking by ID</h2>
+    <form id="deleteBookingForm">
+        <label for="bookingID">Enter Booking ID:</label>
+        <input type="number" id="bookingID" name="bookingID">
+        <button type="button" onclick="deleteBooking()">Delete Booking</button>
+    </form>
+
+    <script src="scheduleScripts.js"></script> <!-- Include your JavaScript file -->
 </body>
+
 </html>
