@@ -109,7 +109,7 @@ async function addFitnessGoal() {
         if (response.ok) {
             console.log('Fitness goal added successfully.');
             //DISPLAY FITNESS GOALS
-            exercise.push({exercise,goal})
+            fetchUserInfo()
             DisplayFitness()
 
         } else {
