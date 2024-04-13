@@ -26,6 +26,8 @@ app.use(session({
 
 const port = 3003;
 
+//###############################################################POSTGRESQL SERVER LOGIN CREDENTIALS##################################################
+
 const client = new Client({
   user: 'postgres',
   host: 'localhost',
@@ -33,6 +35,8 @@ const client = new Client({
   password: 'alex3689',
   port: 5432,
 });
+
+//###############################################################POSTGRESQL SERVER LOGIN CREDENTIALS##################################################
 
 client.connect().then(() => {
   console.log('Connected to PostgreSQL database');

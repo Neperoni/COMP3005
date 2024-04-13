@@ -174,12 +174,3 @@ CREATE TABLE Equipments
     primary key (equipmentID)
 );
 
-
---trainers have several availability windows
---so we need a one to many relationship
---if there are two windows on the same day then trainerID and day is not unique enough
---so also needs start time
---convenient for displaying by soonness
-
-
-
