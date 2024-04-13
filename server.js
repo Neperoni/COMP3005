@@ -985,15 +985,18 @@ app.post('/get_all_equipment', requireLogin(AccountTypes.ADMIN), async (req, res
 // Creates a new Bill
 app.post('/create_bill', async (req,res) => {
   try{
-    const {email, price, reason} = req.body
+    const {email, price, reason} = req.body;
 
+    if(!email || !price || !reason || isNaN(price)) {
+      return res.status(400).json({error: "Please ensure all fields are correctly filled"});
+    }
 
     const query = "INSERT INTO Bills (memberemail, amount, reason, paid) VALUES ($1,$2,$3,false)"
 
     const values = [email, parseFloat(price), reason]
-    console.log(price)
-    await client.query(query,values)
-    res.status(200)
+
+    await client.query(query,values);
+    res.status(200).json({success: true});
   } catch (error) {
     console.error("Error creating new bill", error);
     res.status(500).json({error: 'Internal Server Error'})
@@ -1019,11 +1022,15 @@ app.post('/pay_bill', requireLogin(AccountTypes.ADMIN), async (req,res) => {
   try{
     const {billID} = req.body
 
+    if(!billID || isNaN(billID)){
+      return res.status(400).json({error: "Invalid bill number"})
+    }
+
     const query = "UPDATE Bills SET paid = true WHERE billid = $1"
     const values = [billID]
 
     await client.query(query,values)
-    res.status(200)
+    res.status(200).json({ success: true })
   } catch (error) {
     console.error("Error paying bill", error);
     res.status(500).json({error: 'Internal Server Error'})

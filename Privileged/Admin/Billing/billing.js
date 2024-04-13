@@ -56,8 +56,13 @@ document.getElementById("newBillForm").addEventListener("submit", function(event
     })
     .then(response => response.json())
     .then(data => {
-        alert('Bill added successfully');
+        if(data.success){
+          alert('Bill added successfully');
+        }
     })
+    .catch(error => {
+        console.error('Error creating bill:', error)
+    });
 });
 
 document.getElementById("markAsPaid").addEventListener("submit", function(event) {
@@ -74,6 +79,8 @@ document.getElementById("markAsPaid").addEventListener("submit", function(event)
     })
     .then(response => response.json())
     .then(data => {
-        alert('Bill payed successfully')
+        if (data.success === true){
+            alert('Bill paid successfully')
+        }
     })
 })
