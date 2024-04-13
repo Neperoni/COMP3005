@@ -25,7 +25,6 @@ INSERT INTO Trainers (email, name, phone) VALUES ('trainer3@example.com', 'Henry
 
 
 -- Insert some bill entries
-
 INSERT INTO Bills (memberemail, amount, reason, paid) VALUES 
 ('member1@example.com', 200.05, 'Training Session', false);
 
@@ -40,6 +39,10 @@ INSERT INTO Bills (memberemail, amount, reason, paid) VALUES
 
 INSERT INTO ExerciseRoutine (email, exercisename, exerciseinstructions) 
 VALUES ('member1@example.com', 'PUSHUPS', 'REPS: 30, SETS: 30');
+INSERT INTO ExerciseRoutine (email, exercisename, exerciseinstructions) 
+VALUES ('user1@example.com', 'Sit Ups', 'REPS: 50, SETS: 15');
+INSERT INTO ExerciseRoutine (email, exercisename, exerciseinstructions) 
+VALUES ('member1@example.com', 'Squats', 'REPS: 10, SETS: 5');
 
 -- Insert availability for trainer Alice
 INSERT INTO TrainerAvailabilitys (email, day, start_time, end_time)
