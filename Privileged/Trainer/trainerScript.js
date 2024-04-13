@@ -35,7 +35,14 @@ function displaySearchResults(searchResults) {
     const table = document.getElementById('membersTable');
     console.log(searchResults)
     // Clear existing table rows
-    table.innerHTML = '';
+    table.innerHTML = `<thead>
+    <tr>
+      <th>First Name</th>
+      <th>Last Name</th>
+      <th>Email</th>
+      <th>Resting BPM</th>
+    </tr>
+  </thead>`;
 
     // Loop through each search result and create table rows
     searchResults.forEach(result => {
@@ -237,3 +244,7 @@ function validateTimeSlot(startTime, endTime) {
     return false;
   }
 }
+
+document.addEventListener("DOMContentLoaded", function() {
+  refreshAvailabilities();
+});
