@@ -24,6 +24,9 @@ app.use(session({
   saveUninitialized: false
 }));
 
+
+//#################WEB SERVER PORT  
+
 const port = 3003;
 
 //###############################################################POSTGRESQL SERVER LOGIN CREDENTIALS##################################################
