@@ -25,6 +25,25 @@ INSERT INTO Bills (memberemail, amount, reason, paid) VALUES ('member1@example.c
 INSERT INTO ExerciseRoutine (email, exercisename, exerciseinstructions) 
 VALUES ('member1@example.com', 'PUSHUPS', 'REPS: 30, SETS: 30');
 
+-- Insert availability for trainer Alice
+INSERT INTO TrainerAvailabilitys (email, day, start_time, end_time)
+VALUES 
+    ('trainer1@example.com', '1', '09:00:00', '12:00:00'), -- Monday 9 AM - 12 PM
+    ('trainer1@example.com', '2', '13:00:00', '17:00:00'); -- Tuesday 1 PM - 5 PM
+
+-- Insert availability for trainer Harry
+INSERT INTO TrainerAvailabilitys (email, day, start_time, end_time)
+VALUES 
+    ('trainer2@example.com', '1', '10:00:00', '14:00:00'), -- Wednesday 10 AM - 2 PM
+    ('trainer2@example.com', '3', '08:00:00', '11:00:00'); -- Thursday 8 AM - 11 AM
+
+-- Insert availability for trainer Henry
+INSERT INTO TrainerAvailabilitys (email, day, start_time, end_time)
+VALUES 
+    ('trainer3@example.com', '2', '09:00:00', '12:00:00'), -- Friday 9 AM - 12 PM
+    ('trainer3@example.com', '6', '14:00:00', '18:00:00'); -- Saturday 2 PM - 6 PM
+
+
 -- Insert data into Booking table
 INSERT INTO Booking (day, start_time, end_time, room, traineremail, seats, public, name, description) VALUES
 ('2024-04-15', '09:00:00', '10:00:00', 1, 'trainer1@example.com', 10, true, 'Morning Yoga', 'Relaxing yoga session to start your day'),
