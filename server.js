@@ -799,32 +799,55 @@ app.post('/fetch_bookings_by_trainer', requireLogin(AccountTypes.ADMIN), async (
   }
 });
 
-
 app.post('/create_booking', requireLogin(AccountTypes.ADMIN), async (req, res) => {
   try {
-      const { date, start_time, end_time, room, traineremail, seats, public, name, description } = req.body;
+    const { date, start_time, end_time, room, traineremail, seats, public, name, description } = req.body;
 
-        // Validate data
-      if (!date || !start_time || !end_time || !room || isNaN(room) || !traineremail || !seats || isNaN(seats) || public === undefined || public === null || !name || !description) {
-          return res.status(400).json({ error: 'Please provide all required fields with valid values.' });
-      }
+    // Validate data
+    if (!date || !start_time || !end_time || !room || isNaN(room) || !traineremail || !seats || isNaN(seats) || public === undefined || public === null || !name || !description) {
+      return res.status(400).json({ error: 'Please provide all required fields with valid values.' });
+    }
 
-      // Query database to insert the new booking
-      const query = `
+    const parsedDate = new Date(date + "T00:00:00");
+
+    // Check if the parsing was successful
+    if (isNaN(parsedDate.getTime())) {
+      return res.status(400).json({ error: 'Invalid date format. Please provide a valid date.' });
+    }
+
+    const dayOfWeek = parsedDate.getDay();
+
+    // Check trainer availability
+    const availabilityQuery = `
+      SELECT * FROM TrainerAvailabilitys 
+      WHERE email = $1 AND day = $2 
+      AND start_time <= $3 AND end_time >= $4;
+    `;
+
+    const availabilityValues = [traineremail, dayOfWeek, start_time, end_time];
+    const availabilityResult = await client.query(availabilityQuery, availabilityValues);
+
+    if (availabilityResult.rows.length === 0) {
+      return res.status(400).json({ error: 'Trainer is not available at the specified time.' });
+    }
+
+    // Query database to insert the new booking
+    const bookingQuery = `
       INSERT INTO Booking (day, start_time, end_time, room, traineremail, seats, public, name, description)
       VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9)
       RETURNING *;
-      `;
+    `;
 
-      const values = [date, start_time, end_time, room, traineremail, seats, public, name, description];
-      const newBooking = await client.query(query, values);
+    const bookingValues = [date, start_time, end_time, room, traineremail, seats, public, name, description];
+    const newBooking = await client.query(bookingQuery, bookingValues);
 
-      res.status(200).json({ booking: newBooking.rows[0] });
+    res.status(200).json({ booking: newBooking.rows[0] });
   } catch (error) {
-      console.error('Error creating booking:', error);
-      res.status(500).json({ error: 'Internal Server Error' });
+    console.error('Error creating booking:', error);
+    res.status(500).json({ error: 'Internal Server Error' });
   }
 });
+
 
 app.post('/add_member_to_booking', requireLogin(AccountTypes.ADMIN), async (req, res) => {
   try {
