@@ -5,9 +5,10 @@
 ### Qusai Alkhawaldeh 101202913
 
 ### Video link: https://youtu.be/_J114TTQEs0
+### Github link: https://github.com/Neperoni/COMP3005GroupProject
 
 
-
+### The ER-model and ER-scheme can be found in the documentation folder
 
 then run DDL and DML and it should work
 
