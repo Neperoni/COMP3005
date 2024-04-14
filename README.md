@@ -32,4 +32,10 @@ this should make it work
 2. Private sessions can have multiple people, and so is the same table as public, just with a boolean showing if it is public
 3. Email is unique across member, trainer, and admin as it is used for login
 4. Most fields are non unique, unless specified as a key like email or are compositely unique in a primary key exercise_name, exercise_goal)
-5. 
+5. Members should not create a personal training session, this functionality is given to the admin/secretary/receptionist, in my experience with sports clinics you make appointments through a receptionist. This also would have otherwise exposed alot of trainer information to members, like their working hours every day of the week.
+6. Health stats requirement is fulfilled by resting bpm and blood pressure
+7. Exercise routines requirement is fulfilled by exercise name, instructions, and history of completion
+8. Admin server endpoints are only going to be accessed by admin page
+9. The relationships an admin partakes in is not specific to the admin. So if they schedule something, or create a bill, the admin who did the task is not stored, as their identity is not relevant to the bill or schedule.
+So their lines in the ER model are dashed, they are responsible or partake in many of the relationships, but are not relevant to the contents of the relationship. We also do not store anything about them other than login details.
+
