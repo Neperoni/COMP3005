@@ -773,6 +773,33 @@ app.post('/fetch_bookings_by_room', requireLogin(AccountTypes.ADMIN), async (req
 
 
 // Endpoint to fetch bookings for a specific room
+app.post('/fetch_bookings_by_trainer_date', requireLogin(AccountTypes.ADMIN), async (req, res) => {
+  try {
+    const { traineremail, date } = req.body;
+
+    // Validate data
+    if (!traineremail || !date) {
+      return res.status(400).json({ error: 'Please provide a valid numeric room number.' });
+    }
+
+    // Query database to fetch bookings for the specified room
+    const query = `
+    SELECT *
+    FROM Booking
+    WHERE traineremail = $1 AND day = $2;    
+    `;
+
+    const values = [traineremail, date];
+    const bookings = await client.query(query, values);
+
+    res.status(200).json({ bookings: bookings.rows });
+  } catch (error) {
+    console.error('Error fetching bookings by traineremail:', error);
+    res.status(500).json({ error: 'Internal Server Error' });
+  }
+});
+
+// Endpoint to fetch bookings for a specific room
 app.post('/fetch_bookings_by_trainer', requireLogin(AccountTypes.ADMIN), async (req, res) => {
   try {
     const { traineremail } = req.body;

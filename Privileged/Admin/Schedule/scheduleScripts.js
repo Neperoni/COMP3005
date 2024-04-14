@@ -51,7 +51,7 @@ function searchBookings(email) {
     trainerHeader.textContent = `Bookings for ${email}`;
 
     // Make a request to the server to fetch bookings for the selected trainer on the given date
-    fetch('/fetch_bookings_by_trainer', {
+    fetch('/fetch_bookings_by_trainer_date', {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json'
